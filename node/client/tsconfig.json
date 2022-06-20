@@ -1,0 +1,10 @@
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "include": ["src/**/*", "../server/src"],
+  "exclude": ["node_modules/*", "__sapper__/*", "public/*"],
+  "moduleResolution": "node",
+  "compilerOptions": {
+    "types": ["svelte"],
+    "target": "es2019"
+  }
+}

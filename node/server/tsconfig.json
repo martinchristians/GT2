@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["src/*"],
+      "@actions/*": ["src/actions/*"],
+      "@gql/*": ["src/apis/GraphQLApi/*"],
+      "@telegram/*": ["src/apis/TelegramBot/*"]
+    },
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmitOnError": true,
+    "strict": true,
+    "lib": ["es2015", "es2017", "dom", "esnext.asynciterable"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
+}
