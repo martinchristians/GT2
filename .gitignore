@@ -135,3 +135,8 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,unity
+
+Assets/ImportedAssets
+Assets/PathCreator
+/Assets/ImportedAssets.meta
+/Assets/PathCreator.meta
