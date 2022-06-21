@@ -41,6 +41,11 @@ public class CarController_Script: MonoBehaviour
             else
             {
                 TakeDamage(1);
+
+                if (HealthBarScript.slider.value == 0)
+                {
+                    gameObject.SetActive(false);
+                }
             }
         }
     }
