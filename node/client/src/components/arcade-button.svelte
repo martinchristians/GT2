@@ -13,11 +13,17 @@
 
 <script lang="ts">
   export let variant: ButtonColor = ButtonColor.Blue
+  export let flex = false
   export let disabled: undefined | boolean = undefined
 </script>
 
 <div>
-  <button class={variant} {disabled} on:click on:submit|preventDefault>
+  <button
+    class={`${flex ? 'flex' : ''} ${variant}`}
+    {disabled}
+    on:click
+    on:submit|preventDefault
+  >
     <div><span><slot /></span></div>
   </button>
 </div>
@@ -101,4 +107,12 @@ button
     &::after
       background: linear-gradient(90deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 10%, rgba(0, 0, 0, 0.2) 90%, rgba(0, 0, 0, 0.5) 100%)
 
+  &.flex
+    width: 100%
+    height: 100%
+    > div
+      height: 100%
+      box-sizing: border-box
+      > div
+        height: 100%
 </style>
