@@ -159,6 +159,38 @@ export const schemaClientMessage: Schema = {
         "type": {
           "type": "string",
           "enum": [
+            "return_to_menu"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "start_level"
+          ]
+        },
+        "level": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "level",
+        "type"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
             "button_pressed"
           ]
         },
@@ -206,6 +238,39 @@ export const schemaGameMessage: Schema = {
           },
           "required": [
             "paused",
+            "type"
+          ]
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "recepient": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "level_started"
+              ]
+            },
+            "layout": {
+              "type": "string",
+              "enum": [
+                "default"
+              ]
+            }
+          },
+          "required": [
+            "layout",
             "type"
           ]
         }

@@ -36,6 +36,13 @@ export type ClientMessage =
       pause: boolean
     }
   | {
+      type: 'return_to_menu'
+    }
+  | {
+      type: 'start_level'
+      level: number
+    }
+  | {
       type: 'button_pressed'
       button: string
       pressed: boolean
@@ -47,6 +54,10 @@ export type GameMessage = {
   | {
       type: 'game_paused'
       paused: boolean
+    }
+  | {
+      type: 'level_started'
+      layout: 'default'
     }
   | {
       type: 'enable_button'

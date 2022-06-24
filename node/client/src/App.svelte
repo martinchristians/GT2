@@ -20,7 +20,7 @@
     error = null
     const { roomCode, playerName } = e.detail
     // create new url with search params
-    const host = 'ws://192.168.178.55:3000'
+    const host = 'ws://0.0.0.0:3000'
     const url = new URL(`${host}/joinGame`)
     url.searchParams.set('room', roomCode)
     url.searchParams.set('name', playerName)
@@ -86,8 +86,7 @@
 
 <style lang="sass">
 .level-select
-  display: grid
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr))
+  display: flex
   flex-direction: column
   padding: 16px
   gap: 20px 16px
