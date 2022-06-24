@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { GameMessage, ServerMessage } from '../../server/src/messages'
-import ArcadeButton from './components/arcade-button.svelte'
+  import ArcadeButton from './components/arcade-button.svelte'
   import GameHeader from './components/game-header.svelte'
   import Gamepad from './components/gamepad.svelte'
   import Join, { JoinEvent } from './views/join.svelte'
 
   let view = 'join'
-  // let view = 'lobby'
+  // let view = 'dd'
   let paused = false
   let players: {
     id: number
@@ -20,7 +20,7 @@ import ArcadeButton from './components/arcade-button.svelte'
     error = null
     const { roomCode, playerName } = e.detail
     // create new url with search params
-    const host = 'ws://localhost:3000'
+    const host = 'ws://192.168.178.55:3000'
     const url = new URL(`${host}/joinGame`)
     url.searchParams.set('room', roomCode)
     url.searchParams.set('name', playerName)
@@ -48,22 +48,26 @@ import ArcadeButton from './components/arcade-button.svelte'
         name: msg.name,
       }
     } else if (msg.type === 'player_left') {
-      delete players[msg.id]
+      players[msg.id] = undefined
     }
   }
 </script>
 
-{#if view === 'join'}
-  <Join on:join={join} />
-{:else}
-  <GameHeader />
-{/if}
+<main>
+  {#if view === 'join'}
+    {#if error}
+      <div class="error">{error}</div>
+    {/if}
+    <Join on:join={join} />
+  {:else}
+    <GameHeader />
+    {/if}
 
-<!-- <Gamepad /> -->
+  <!-- <Gamepad /> -->
 
-{#if view === 'lobby'}
-<div class="hbox grow">
-  <section class="grow">
+  {#if view === 'lobby'}
+    <div class="hbox grow">
+  <section class="players grow scroll">
     <h2>Players</h2>
     <ul>
       {#each players as player}
@@ -71,17 +75,31 @@ import ArcadeButton from './components/arcade-button.svelte'
       {/each}
     </ul>
   </section>
-  <section class="level-select grow">
+  <section class="level-select grow scroll">
     <ArcadeButton flex={true}>Level 1</ArcadeButton>
     <ArcadeButton flex={true}>Level 2</ArcadeButton>
     <ArcadeButton flex={true}>Level 3</ArcadeButton>
   </section>
 </div>
-{/if}
+  {/if}
+</main>
+
 <style lang="sass">
 .level-select
-  display: flex
+  display: grid
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr))
   flex-direction: column
   padding: 16px
-  gap: 32px
+  gap: 20px 16px
+
+.players
+  h2
+    padding-block-end: 12px
+  ul
+    list-style: none
+    padding: 0
+    li
+      display: block
+      padding: 4px
+      border-radius: 8px
 </style>

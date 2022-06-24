@@ -1,11 +1,24 @@
 <script lang="ts">
   import ArcadeButton, { ButtonColor } from './arcade-button.svelte'
+  import IconExit from '../assets/icons/48-exit.svg'
+  import IconFullscreen from '../assets/icons/48-fullscreen.svg'
+  import IconPause from '../assets/icons/48-pause.svg'
+  import IconPlay from '../assets/icons/48-play.svg'
+
+  function toggleFullscreen() {
+    if (window.innerHeight == screen.height) {
+      document.exitFullscreen()
+    } else {
+      document.querySelector("main").requestFullscreen()
+    }
+  }
 </script>
 
 <header>
-  <ArcadeButton variant={ButtonColor.Red}>Exit</ArcadeButton>
+  <ArcadeButton icon={true} variant={ButtonColor.Red}>{@html IconExit}</ArcadeButton>
   <div class="lcd">106.2 LOBBY FM</div>
-  <ArcadeButton disabled={true} variant={ButtonColor.Yellow}>Pause</ArcadeButton>
+  <ArcadeButton on:click={toggleFullscreen} icon={true}>{@html IconFullscreen}</ArcadeButton>
+  <ArcadeButton icon={true} disabled={true} variant={ButtonColor.Yellow}>{@html IconPause}</ArcadeButton>
 </header>
 
 <style lang="sass">

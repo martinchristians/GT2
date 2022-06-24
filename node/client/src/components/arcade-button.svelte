@@ -14,12 +14,13 @@
 <script lang="ts">
   export let variant: ButtonColor = ButtonColor.Blue
   export let flex = false
+  export let icon = false
   export let disabled: undefined | boolean = undefined
 </script>
 
 <div>
   <button
-    class={`${flex ? 'flex' : ''} ${variant}`}
+    class={`${flex ? 'flex' : ''} ${icon ? 'icon' : ''} ${variant}`}
     {disabled}
     on:click
     on:submit|preventDefault
@@ -115,4 +116,10 @@ button
       box-sizing: border-box
       > div
         height: 100%
+
+  &.icon > div
+    padding: 0
+    line-height: 0
+    overflow: hidden
+
 </style>

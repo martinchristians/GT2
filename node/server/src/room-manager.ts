@@ -3,7 +3,7 @@ import Hashids from 'hashids'
 import * as utils from './utils'
 import Room, { RoomWebSocket } from './room'
 
-const hashids = new Hashids()
+const hashids = new Hashids('', 4, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 
 export const SERVER_ID = undefined
 export const GAME_ID = -1
@@ -32,7 +32,7 @@ export class RoomManager {
     // generate a random room id until we find one that doesn't exist
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const roomCode = hashids.encode(utils.getRandomIntInclusive(100, 10000))
+      const roomCode = hashids.encode(utils.getRandomIntInclusive(0, 10000))
       if (!this.rooms[roomCode]) {
         return roomCode
       }
