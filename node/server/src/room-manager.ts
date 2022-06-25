@@ -21,6 +21,7 @@ export class RoomManager {
       room.closeRoom()
       delete this.rooms[roomCode]
     })
+    console.log('New Room', roomCode)
     return roomCode
   }
 
@@ -32,7 +33,7 @@ export class RoomManager {
     // generate a random room id until we find one that doesn't exist
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const roomCode = hashids.encode(utils.getRandomIntInclusive(0, 10000))
+      const roomCode = hashids.encode(utils.getRandomIntInclusive(0, 150))
       if (!this.rooms[roomCode]) {
         return roomCode
       }

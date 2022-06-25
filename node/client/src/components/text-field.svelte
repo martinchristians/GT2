@@ -12,13 +12,7 @@
 
 <div>
   <label for={inputId}>{label}</label>
-  <input
-    id={inputId}
-    type="input"
-    bind:value
-    {placeholder}
-    {disabled}
-  />
+  <input id={inputId} type="input" bind:value {placeholder} {disabled} />
 </div>
 
 <style lang="sass">

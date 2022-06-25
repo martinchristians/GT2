@@ -1,4 +1,4 @@
-// Don't forget to run 'npm run json-schema' after changing this file!
+// This is a generated file. Do not edit. Look at server/src/messages.ts for the source.
 
 export type ServerMessage =
   | {

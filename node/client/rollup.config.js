@@ -26,10 +26,13 @@ export default [{
   },
   plugins: [
     svelte({
-      preprocess: sveltePreprocess(),
+      preprocess: sveltePreprocess({
+        sourceMap: !production,
+      }),
 
       compilerOptions: {
         dev: !production,
+        enableSourcemap: !production,
       }
     }),
     postcss(),

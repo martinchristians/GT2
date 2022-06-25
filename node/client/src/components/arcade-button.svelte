@@ -1,28 +1,46 @@
-<script context="module" lang="ts">
-  export enum ButtonColor {
-    Blue = 'blue',
-    Neon = 'neon',
-    Green = 'green',
-    Yellow = 'yellow',
-    Red = 'red',
-    Orange = 'orange',
-    Pink = 'pink',
-    Purple = 'purple',
-  }
-</script>
-
 <script lang="ts">
+  import throttel from 'lodash/throttle'
+  import { createEventDispatcher } from 'svelte'
+  import { ButtonColor } from '@server/messages'
+
   export let variant: ButtonColor = ButtonColor.Blue
   export let flex = false
   export let icon = false
+  export let multiTouch = false
+  export let style: string | undefined = undefined
   export let disabled: undefined | boolean = undefined
+
+  const dispatch = createEventDispatcher()
+
+  let pressed = false
+
+  const setPressed = throttel((p: boolean) => {
+    if (p && disabled) return
+    if (p === pressed) return
+    pressed = p
+    dispatch('pressed', p)
+  }, 250)
 </script>
 
-<div>
+<div {style}>
   <button
-    class={`${flex ? 'flex' : ''} ${icon ? 'icon' : ''} ${variant}`}
+    class={`${flex ? 'flex' : ''} ${icon ? 'icon' : ''} ${
+      multiTouch && pressed ? 'pressed' : ''
+    } ${variant}`}
     {disabled}
     on:click
+    on:mousedown={() => {
+      setPressed(true)
+    }}
+    on:mouseup={() => {
+      setPressed(false)
+    }}
+    on:touchstart={() => {
+      setPressed(true)
+    }}
+    on:touchend={() => {
+      setPressed(false)
+    }}
     on:submit|preventDefault
   >
     <div><span><slot /></span></div>
@@ -41,6 +59,9 @@ button
   padding: 0
   margin-bottom: 8px
   > div
+    display: flex
+    justify-content: center
+    align-items: center
     overflow: hidden
     transition: transform 100ms cubic-bezier(0.4, 0.6, 0.8, 2.0), background-color 500ms cubic-bezier(1, 2.25, 0.1, -0.5)
     box-shadow: inset 0px 0px 0px 2px rgba(0, 0, 0, 0.1), inset 0px 4px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(0, 0, 0, 0.15)
@@ -79,7 +100,7 @@ button
     transform: translateY(8px)
     border-radius: 12px
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25)
-  &:active:enabled > div
+  &:active:enabled > div, &.pressed:enabled > div
     transform: translateY(6px)
     &::after
       opacity: 0.9
@@ -114,8 +135,6 @@ button
     > div
       height: 100%
       box-sizing: border-box
-      > div
-        height: 100%
 
   &.icon > div
     padding: 0

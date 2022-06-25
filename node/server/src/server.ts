@@ -54,7 +54,6 @@ export default class {
         }
         this.websocketServer.handleUpgrade(request, socket, head, (socket) => {
           room.addPlayer(socket as RoomWebSocket, playerName)
-          socket.on('message', (message) => console.log(message))
         })
         return
       }

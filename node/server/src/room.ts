@@ -90,6 +90,7 @@ export default class Room {
 
   handleClientMessage(id: number, message: RawData, isBinary: boolean) {
     const reply = (code: string, error: string) => {
+      console.log(`[Error for P${id}]`, { code, error })
       this.msgPlayer(
         id,
         {
@@ -109,6 +110,7 @@ export default class Room {
       message.toString(),
       reply,
     ) as ClientMessage | null
+    console.log(`[Message from P${id}]`, msg)
     if (!msg) {
       return
     }
@@ -118,6 +120,7 @@ export default class Room {
   handleServerMessage(message: RawData, isBinary: boolean) {
     try {
       const reply = (code: string, error: string) => {
+        console.log('[Error for Game]', { code, error })
         this.msgGame(
           {
             type: 'invalid_message',
@@ -135,6 +138,7 @@ export default class Room {
         message.toString(),
         reply,
       ) as GameMessage | null
+      console.log(`[Message from game]`, msg)
       if (!msg) {
         return
       }
@@ -194,6 +198,7 @@ export default class Room {
   }
 
   closeRoom() {
+    console.log('[Room closed]')
     this.game.close()
     this.players.filter(utils.notUndefined).forEach((player) => {
       player.socket.close()

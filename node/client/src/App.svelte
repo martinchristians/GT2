@@ -1,17 +1,22 @@
 <script lang="ts">
-  import type { GameMessage, ServerMessage } from '../../server/src/messages'
+  import type {
+    ClientMessage,
+    GameMessage,
+    GamepadLayout,
+    Player,
+    ServerMessage,
+  } from '@server/messages'
   import ArcadeButton from './components/arcade-button.svelte'
   import GameHeader from './components/game-header.svelte'
   import Gamepad from './components/gamepad.svelte'
+  import defaultLayout from './default-layout'
   import Join, { JoinEvent } from './views/join.svelte'
 
   let view = 'join'
-  // let view = 'dd'
   let paused = false
-  let players: {
-    id: number
-    name: string
-  }[] = []
+  let players: Player[] = []
+  let buttonLayout: GamepadLayout = defaultLayout
+  let disabledButtons = new Set<string>()
 
   let socket: WebSocket | null = null
   let error: string | null = null
@@ -20,7 +25,7 @@
     error = null
     const { roomCode, playerName } = e.detail
     // create new url with search params
-    const host = 'ws://0.0.0.0:3000'
+    const host = 'ws://192.168.178.55:3000'
     const url = new URL(`${host}/joinGame`)
     url.searchParams.set('room', roomCode)
     url.searchParams.set('name', playerName)
@@ -49,6 +54,48 @@
       }
     } else if (msg.type === 'player_left') {
       players[msg.id] = undefined
+    } else if (msg.type === 'game_disconnected') {
+      socket = null
+      leave()
+    } else if (msg.type === 'invalid_message') {
+      console.error('Invalid message:', msg)
+    } else if (msg.type === 'set_paused') {
+      paused = msg.paused
+    } else if (msg.type === 'level_started') {
+      view = 'game'
+      paused = false
+      disabledButtons.clear()
+      disabledButtons = disabledButtons
+      if (msg.layout == 'default') {
+        buttonLayout = defaultLayout
+      } else {
+        buttonLayout = msg.layout
+      }
+    } else if (msg.type === 'main_menu_opened') {
+      view = 'lobby'
+    } else if (msg.type === 'set_buttons') {
+      if (msg.enabled) {
+        msg.buttons.map((b) => disabledButtons.delete(b))
+        disabledButtons = disabledButtons
+      } else {
+        msg.buttons.map((b) => disabledButtons.add(b))
+        disabledButtons = disabledButtons
+        console.log('disabled buttons', msg.buttons)
+      }
+    }
+  }
+
+  function leave() {
+    if (socket) {
+      socket.close()
+      socket = null
+    }
+    view = 'join'
+  }
+
+  function send(msg: ClientMessage) {
+    if (socket) {
+      socket.send(JSON.stringify(msg))
     }
   }
 </script>
@@ -60,27 +107,59 @@
     {/if}
     <Join on:join={join} />
   {:else}
-    <GameHeader />
-    {/if}
-
-  <!-- <Gamepad /> -->
+    <GameHeader
+      {paused}
+      gameRunning={view === 'game'}
+      on:leave={leave}
+      on:pause={() => send({ type: 'request_pause', pause: !paused })}
+    />
+  {/if}
 
   {#if view === 'lobby'}
     <div class="hbox grow">
-  <section class="players grow scroll">
-    <h2>Players</h2>
-    <ul>
-      {#each players as player}
-      {#if player}<li>{player.name}</li>{/if}
-      {/each}
-    </ul>
-  </section>
-  <section class="level-select grow scroll">
-    <ArcadeButton flex={true}>Level 1</ArcadeButton>
-    <ArcadeButton flex={true}>Level 2</ArcadeButton>
-    <ArcadeButton flex={true}>Level 3</ArcadeButton>
-  </section>
-</div>
+      <section class="players grow scroll">
+        <h2>Players</h2>
+        <ul>
+          {#each players as player}
+            {#if player}<li>{player.name}</li>{/if}
+          {/each}
+        </ul>
+      </section>
+      <section class="level-select grow scroll">
+        <h2>Level</h2>
+        {#each [1, 2, 3] as level}
+          <ArcadeButton
+            flex={true}
+            on:click={() =>
+              send({
+                type: 'start_level',
+                level,
+              })}>Level {level}</ArcadeButton
+          >
+        {/each}
+      </section>
+    </div>
+  {:else if view === 'game'}
+    <Gamepad
+      {buttonLayout}
+      {disabledButtons}
+      {paused}
+      on:pressed={(e) =>
+        send({
+          type: 'button_pressed',
+          button: e.detail.name,
+          pressed: e.detail.pressed,
+        })}
+      on:toMenu={() =>
+        send({
+          type: 'return_to_menu',
+        })}
+      on:unpause={() =>
+        send({
+          type: 'request_pause',
+          pause: false,
+        })}
+    />
   {/if}
 </main>
 
