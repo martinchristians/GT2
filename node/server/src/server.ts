@@ -47,7 +47,7 @@ export default class {
           return
         }
 
-        const room = this.roomManager.getRoom(roomCode)
+        const room = this.roomManager.getRoom(roomCode.toUpperCase())
         if (!room) {
           socket.destroy()
           return
