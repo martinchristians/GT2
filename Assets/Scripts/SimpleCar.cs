@@ -187,15 +187,15 @@ public class SimpleCar : MonoBehaviour {
 
 	float GetSteerInput () {
 		float steerInput = 0f;
-		if(Input.GetKey(KeyCode.A)) steerInput -= 1f;
-		if(Input.GetKey(KeyCode.D)) steerInput += 1f;
+		if(Input.GetKey(KeyCode.A) || Communication.GameClient.ButtonIsPressed(Communication.Button.left)) steerInput -= 1f;
+		if(Input.GetKey(KeyCode.D) || Communication.GameClient.ButtonIsPressed(Communication.Button.right)) steerInput += 1f;
 		return steerInput;
 	}
 
 	float GetGasInput () {
 		float gasInput = 0f;
-		if(Input.GetKey(KeyCode.W)) gasInput += 1f;
-		if(Input.GetKey(KeyCode.S)) gasInput -= 1f;
+		if(Input.GetKey(KeyCode.W) || Communication.GameClient.ButtonIsPressed(Communication.Button.forward)) gasInput += 1f;
+		if(Input.GetKey(KeyCode.S) || Communication.GameClient.ButtonIsPressed(Communication.Button.back)) gasInput -= 1f;
 		return gasInput;
 	}
 
