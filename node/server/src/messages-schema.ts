@@ -223,7 +223,7 @@ export const schemaGameMessage: Schema = {
         {
           "type": "object",
           "properties": {
-            "recepient": {
+            "recipient": {
               "type": "number"
             }
           }
@@ -253,7 +253,7 @@ export const schemaGameMessage: Schema = {
         {
           "type": "object",
           "properties": {
-            "recepient": {
+            "recipient": {
               "type": "number"
             }
           }
@@ -293,7 +293,7 @@ export const schemaGameMessage: Schema = {
         {
           "type": "object",
           "properties": {
-            "recepient": {
+            "recipient": {
               "type": "number"
             }
           }
@@ -319,7 +319,7 @@ export const schemaGameMessage: Schema = {
         {
           "type": "object",
           "properties": {
-            "recepient": {
+            "recipient": {
               "type": "number"
             }
           }

@@ -46,7 +46,7 @@ export type ClientMessage =
     }
 
 export type GameMessage = {
-  recepient?: number
+  recipient?: number
 } & (
   | {
       type: 'set_paused'

@@ -142,8 +142,8 @@ export default class Room {
       if (!msg) {
         return
       }
-      if ('recepient' in msg && msg.recepient != undefined) {
-        this.msgPlayer(msg.recepient, msg, GAME_ID)
+      if ('recipient' in msg && msg.recipient != undefined) {
+        this.msgPlayer(msg.recipient, msg, GAME_ID)
       } else {
         this.msgAllPlayers(msg, GAME_ID)
       }
