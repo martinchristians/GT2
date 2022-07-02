@@ -15,7 +15,6 @@ public class GameManager : MonoBehaviour {
 
     bool m_loading = false;
     int m_nextScene = -1;
-    bool m_playerLeft = false;
     List<PlayerData> m_currentLevelPlayers = new List<PlayerData>();
 
     bool isInLevel => UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex > 0;
