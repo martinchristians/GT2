@@ -10,8 +10,12 @@ namespace Communication {
         public static event System.Action<string> onRoomCodeGenerated = delegate {};
         public static event System.Action<int> onLevelStartRequested = delegate {};
         public static event System.Action onMainMenuRequested = delegate {};
+        public static event System.Action<PlayerData> onPlayerJoined = delegate {};
+        public static event System.Action<PlayerData> onPlayerLeft = delegate {};
+        public static event System.Action onPlayersChanged = delegate {};
 
         public static string roomCode { get; private set; }
+        public static bool connected => !string.IsNullOrWhiteSpace(roomCode);
 
         public static bool ButtonIsPressed (string button) {
             if(buttonPressed.TryGetValue(button, out var output)){
@@ -30,6 +34,9 @@ namespace Communication {
 
         private static ClientWebSocket socket;
         private static Dictionary<string, bool> buttonPressed = new Dictionary<string, bool>();
+
+        private static List<PlayerData> _connectedPlayers = new List<PlayerData>();
+        public static IReadOnlyList<PlayerData> connectedPlayers => _connectedPlayers;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static async void CreateClient () {
@@ -74,6 +81,22 @@ namespace Communication {
                     case "button_pressed":
                         buttonPressed[data.button] = data.pressed;
                         break;
+                    case "player_joined":
+                        var newPlayer = new PlayerData(){
+                            id = data.id,
+                            name = data.name
+                        };
+                        _connectedPlayers.Add(newPlayer);
+                        onPlayerJoined(newPlayer);
+                        onPlayersChanged();
+                        break;
+                    case "player_left":
+                        var removeIndex = _connectedPlayers.FindIndex((pd) => pd.id == data.id);
+                        var removedPlayer = _connectedPlayers[removeIndex];
+                        _connectedPlayers.RemoveAt(removeIndex);
+                        onPlayerLeft(removedPlayer);
+                        onPlayersChanged();
+                        break;
                     default:
                         Debug.LogWarning($"Unimplemented server message type \"{data.type}\". Raw message:\n{receivedText}");
                         break;
@@ -92,31 +115,40 @@ namespace Communication {
         }
 
         public static async void UpdatePauseState (bool value) {
-            await SendMessage(JsonUtility.ToJson(new GameMessage(){
+            await SendMessage(JsonUtility.ToJson(new BroadcastGameMessage(){
                 type = "set_paused",
                 paused = value
             }));
         }
 
-        public static async void SendButtonsEnabled (string[] buttonIds, bool value) {
-            await SendMessage(JsonUtility.ToJson(new GameMessage(){
+        public static async void SendButtonsEnabled (int playerId, IEnumerable<string> buttonIds, bool value) {
+            await SendMessage(JsonUtility.ToJson(new TargetedGameMessage(){
+                recipient = playerId,
                 type = "set_buttons",
-                buttons = buttonIds,  // TODO maybe use an enum or something for this. 
+                buttons = new List<string>(buttonIds).ToArray(),
                 enabled = value
             }));
         }
 
         public static async void SendMainMenuOpened () {
-            await SendMessage(JsonUtility.ToJson(new GameMessage(){
+            await SendMessage(JsonUtility.ToJson(new BroadcastGameMessage(){
                 type = "main_menu_opened"
             }));
         }
 
-        public static async void SendLevelStarted () {
-            await SendMessage(JsonUtility.ToJson(new GameMessage(){
-                type = "level_started",
-                layout = "default"  // TODO gamepadlayout?
-            }));
+        public static async void SendLevelStarted (int playerId = -1) {
+            if(playerId < 0){
+                await SendMessage(JsonUtility.ToJson(new BroadcastGameMessage(){
+                    type = "level_started",
+                    layout = "default"  // TODO gamepadlayout?
+                }));
+            }else{
+                await SendMessage(JsonUtility.ToJson(new TargetedGameMessage(){
+                    recipient = playerId,
+                    type = "level_started",
+                    layout = "default"  // TODO gamepadlayout?
+                }));
+            }
         }
 
     }

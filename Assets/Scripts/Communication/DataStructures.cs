@@ -1,16 +1,29 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace Communication {
 
     [System.Serializable]
-    struct GameMessage {
+    struct BroadcastGameMessage {
 
         [SerializeField] public string type;
         [SerializeField] public bool paused;
         [SerializeField] public string[] buttons;
         [SerializeField] public bool enabled;
-        [SerializeField] public string layout;  // TODO object? because of gamepadlayout?
+        [SerializeField] public string layout;
+        
+    }
+
+    [System.Serializable]
+    struct TargetedGameMessage {
+
+        [SerializeField] public int recipient;
+        [SerializeField] public string type;
+        [SerializeField] public bool paused;
+        [SerializeField] public string[] buttons;
+        [SerializeField] public bool enabled;
+        [SerializeField] public string layout;
         
     }
 
@@ -32,7 +45,7 @@ namespace Communication {
     }
 
     [System.Serializable]
-    struct PlayerData {
+    public struct PlayerData {
 
         [SerializeField] public int id;
         [SerializeField] public string name;
@@ -48,9 +61,13 @@ namespace Communication {
             return id;
         }
 
+        public override string ToString () {
+            return JsonUtility.ToJson(this, true);
+        }
+
     }
 
-    static class Button {
+    public static class Button {
 
         public const string left = "left";
         public const string right = "right";
@@ -64,6 +81,16 @@ namespace Communication {
             yield return back;
         } }
 
+        public static IEnumerable<string> GetOpposite (IEnumerable<string> inputButtons) {
+            foreach(var button in all){
+                if(!inputButtons.Contains(button)){
+                    yield return button;
+                }
+            }
+        }
+
     }
+
+
 
 }
