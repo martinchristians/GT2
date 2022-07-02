@@ -14,7 +14,10 @@ namespace Communication {
         public static string roomCode { get; private set; }
 
         public static bool ButtonIsPressed (string button) {
-            return buttonPressed[button];
+            if(buttonPressed.TryGetValue(button, out var output)){
+                return output;
+            }
+            return false;
         }
 
         public static void ResetButtonsPressed () {
@@ -26,7 +29,7 @@ namespace Communication {
         }
 
         private static ClientWebSocket socket;
-        private static Dictionary<string, bool> buttonPressed;
+        private static Dictionary<string, bool> buttonPressed = new Dictionary<string, bool>();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static async void CreateClient () {
