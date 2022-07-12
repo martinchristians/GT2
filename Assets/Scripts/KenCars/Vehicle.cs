@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace KenCars {
 
@@ -57,6 +54,7 @@ namespace KenCars {
         bool nearGround, onGround;
         
         Vector3 containerBase;
+        Vector3 initialOffset;
         
         // Functions
         
@@ -84,6 +82,8 @@ namespace KenCars {
             
             container = vehicleModel.GetChild(0);
             containerBase = container.localPosition;
+
+            initialOffset = new Vector3(0, this.transform.position.y - sphere.transform.position.y, 0);
             
         }
         
@@ -193,7 +193,7 @@ namespace KenCars {
                 
             }
             
-            transform.position = sphere.transform.position + new Vector3(0, 0.35f, 0);
+            transform.position = sphere.transform.position + initialOffset;
             
             // Simulated drag on ground thanks to Adam Hunt
             
@@ -214,7 +214,7 @@ namespace KenCars {
             
             if(!controllable){ return; }
             
-            speed = acceleration;
+            speed += acceleration;
             
         }
         
@@ -222,7 +222,7 @@ namespace KenCars {
             
             if(!controllable){ return; }
             
-            speed = -acceleration;
+            speed -= acceleration;
             
         }
         
@@ -244,7 +244,7 @@ namespace KenCars {
 
             wheelAngle = Mathf.Clamp(wheelAngle + (4 * Time.deltaTime * direction), -1, 1);
             
-            if(nearGround || steerInAir){ rotate = steering * direction; }
+            if(nearGround || steerInAir){ rotate += steering * direction; }
             
         }
         
