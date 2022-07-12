@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading;
+using System.Linq;
 using UnityEngine;
 
 namespace Communication {
@@ -9,10 +10,13 @@ namespace Communication {
 
         public static event System.Action<string> onRoomCodeGenerated = delegate {};
         public static event System.Action<int> onLevelStartRequested = delegate {};
-        public static event System.Action onMainMenuRequested = delegate {};
+        public static event System.Action<PlayerData> onMainMenuRequested = delegate {};
         public static event System.Action<PlayerData> onPlayerJoined = delegate {};
         public static event System.Action<PlayerData> onPlayerLeft = delegate {};
         public static event System.Action onPlayersChanged = delegate {};
+
+        public static event System.Action<PlayerData> onPauseRequested = delegate {};
+        public static event System.Action<PlayerData> onUnpauseRequested = delegate {};
 
         public static string roomCode { get; private set; }
         public static bool connected => !string.IsNullOrWhiteSpace(roomCode);
@@ -76,7 +80,7 @@ namespace Communication {
                         onLevelStartRequested(data.level);
                         break;
                     case "return_to_menu":
-                        onMainMenuRequested();
+                        onMainMenuRequested(connectedPlayers.Single((pd) => pd.id == data.from));
                         break;
                     case "button_pressed":
                         buttonPressed[data.button] = data.pressed;
@@ -96,6 +100,13 @@ namespace Communication {
                         _connectedPlayers.RemoveAt(removeIndex);
                         onPlayerLeft(removedPlayer);
                         onPlayersChanged();
+                        break;
+                    case "request_pause":
+                        if(data.pause){
+                            onPauseRequested(connectedPlayers.Single((pd) => pd.id == data.from));
+                        }else{
+                            onUnpauseRequested(connectedPlayers.Single((pd) => pd.id == data.from));
+                        }
                         break;
                     default:
                         Debug.LogWarning($"Unimplemented server message type \"{data.type}\". Raw message:\n{receivedText}");

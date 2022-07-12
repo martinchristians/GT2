@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: GameConfig
   m_EditorClassIdentifier: 
   <carPrefab>k__BackingField: {fileID: 2365087100739318514, guid: 8cf68119307a53741be66bdfb073c680, type: 3}
+  <pauseMenuPrefab>k__BackingField: {fileID: 2843736368542121937, guid: ab609c2ce92a01a4a8c1ea05a36501a4, type: 3}

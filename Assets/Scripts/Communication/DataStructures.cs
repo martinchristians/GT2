@@ -37,10 +37,11 @@ namespace Communication {
         [SerializeField] public string code;
         [SerializeField] public string message;
         [SerializeField] public PlayerData[] players;
-        [SerializeField] public bool paused;
+        [SerializeField] public bool pause;
         [SerializeField] public int level;
         [SerializeField] public string button;
         [SerializeField] public bool pressed;
+        [SerializeField] public int from;
 
     }
 

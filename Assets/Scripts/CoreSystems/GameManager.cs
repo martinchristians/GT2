@@ -21,12 +21,17 @@ namespace CoreSystems {
 
         bool isInLevel => UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex > 0;
 
+        public static bool isPaused { get; private set; }
+        public static PlayerData pausedByPlayerData { get; private set; }
+
         void Awake () {
+            UI.PauseMenu.EnsureExists();
             GameClient.onLevelStartRequested += OnLevelRequested;
             GameClient.onMainMenuRequested += OnMainMenuRequested;
-            // GameClient.onPlayersChanged += () => m_playersChanged = true;
             GameClient.onPlayerLeft += OnPlayerLeft;
             GameClient.onPlayerJoined += OnPlayerJoined;
+            GameClient.onPauseRequested += OnPauseRequested;
+            GameClient.onUnpauseRequested += OnUnPauseRequested;
 
             void OnLevelRequested (int requestedLevel) {
                 if(m_loading || isInLevel){
@@ -35,9 +40,14 @@ namespace CoreSystems {
                 m_nextScene = requestedLevel;
             }
 
-            void OnMainMenuRequested () {
+            void OnMainMenuRequested (PlayerData mainMenuPlayer) {
                 if(m_loading || !isInLevel){
                     return;
+                }
+                if(isPaused){
+                    if(!mainMenuPlayer.Equals(pausedByPlayerData)){
+                        return;
+                    }
                 }
                 m_nextScene = MAIN_MENU_SCENE_INDEX;
             }
@@ -51,6 +61,9 @@ namespace CoreSystems {
                     m_nextScene = MAIN_MENU_SCENE_INDEX;
                 }else{
                     IngameButtonLayout.ApplyForPlayers(m_currentLevelPlayers);
+                    if(isPaused && leftPlayer.Equals(pausedByPlayerData)){
+                        Unpause();
+                    }
                 }
             }
 
@@ -60,6 +73,18 @@ namespace CoreSystems {
                 }
                 GameClient.SendLevelStarted(newPlayer.id);
                 GameClient.SendButtonsEnabled(newPlayer.id, Button.all, false);
+            }
+
+            void OnPauseRequested (PlayerData pausePlayer) {
+                if(!m_loading && isInLevel && !isPaused){
+                    Pause(pausePlayer);
+                }
+            }
+
+            void OnUnPauseRequested (PlayerData unpausePlayer) {
+                if(isPaused && pausedByPlayerData.Equals(unpausePlayer)){
+                    Unpause();
+                }
             }
         }
 
@@ -112,10 +137,27 @@ namespace CoreSystems {
                     }
                 }
                 spawn.SpawnCar();
+                Unpause();
             }else{
                 GameClient.SendMainMenuOpened();
             }
             m_loading = false;
+        }
+
+        void Pause (PlayerData pausePlayer) {
+            isPaused = true;
+            pausedByPlayerData = pausePlayer;
+            UI.PauseMenu.instance.Show(pausePlayer.name);
+            GameClient.UpdatePauseState(true);
+            Time.timeScale = 0f;
+        }
+
+        void Unpause () {
+            isPaused = false;
+            pausedByPlayerData = default;
+            UI.PauseMenu.instance.Hide();
+            GameClient.UpdatePauseState(false);
+            Time.timeScale = 1f;
         }
 
     }
