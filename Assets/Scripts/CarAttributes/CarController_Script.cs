@@ -14,6 +14,8 @@ public class CarController_Script: MonoBehaviour
     public GameObject shields;
     [SerializeField] private bool shields_b;
 
+    public Animator anim;
+    
     private void Start()
     {
         currentHealth = maxHealth;
@@ -23,10 +25,10 @@ public class CarController_Script: MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "Damage Wall")
+        if (collision.gameObject.name == "Wall")
         {
-            Debug.Log("COLLIDE DAMAGE WALL");
-
+            Debug.Log("COLLIDE WALL");
+            // if user has shield, then get neither damage nor disadvantage effect 
             if (shields_b == true)
             {
                 shields.transform.GetChild(shieldNumber).gameObject.GetComponent<Image>().enabled = false;
@@ -40,14 +42,27 @@ public class CarController_Script: MonoBehaviour
             else
             {
                 TakeDamage(1);
-
+                
                 if (HealthBarScript.slider.value == 0)
                 {
-                    // destroy spawn car
+                    // destroy spawn vehicle
                     //Destroy(transform.parent.gameObject);
                     
                     // hide vehicle
                     transform.parent.gameObject.transform.GetChild(1).gameObject.SetActive(false);
+                }
+                else
+                {
+                    if (collision.gameObject.tag == "Damage Wall")
+                    {
+                        Debug.Log("Collide with normal wall");
+                    }
+                    else if (collision.gameObject.tag == "BigSmall Wall")
+                    {
+                        Debug.Log("Collide with BigSmall wall");
+                        anim.Play("BigSmall");
+                        currentHealth += 1;
+                    }
                 }
             }
         }
@@ -57,7 +72,7 @@ public class CarController_Script: MonoBehaviour
     {
         if (collision.gameObject.name == "Shield")
         {
-            Debug.Log("PROTECTION");
+            Debug.Log("shield active");
             
             shields_b = true;
             for (int i = 0; i < 3; i++)
