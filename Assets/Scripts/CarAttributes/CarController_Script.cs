@@ -11,22 +11,21 @@ public class CarController_Script: MonoBehaviour
     private int shieldNumber = 2;
     
     public HealthBar_Script HealthBarScript;
-    private GameObject shields;
+    public GameObject shields;
     [SerializeField] private bool shields_b;
 
     private void Start()
     {
         currentHealth = maxHealth;
         HealthBarScript.SetMaxHealth(maxHealth);
-        shields = GameObject.Find("Shields");
         shields_b = false;
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name == "Wall")
+        if (collision.gameObject.tag == "Damage Wall")
         {
-            Debug.Log("COLLIDE");
+            Debug.Log("COLLIDE DAMAGE WALL");
 
             if (shields_b == true)
             {
@@ -44,7 +43,11 @@ public class CarController_Script: MonoBehaviour
 
                 if (HealthBarScript.slider.value == 0)
                 {
-                    gameObject.SetActive(false);
+                    // destroy spawn car
+                    //Destroy(transform.parent.gameObject);
+                    
+                    // hide vehicle
+                    transform.parent.gameObject.transform.GetChild(1).gameObject.SetActive(false);
                 }
             }
         }

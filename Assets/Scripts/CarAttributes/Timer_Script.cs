@@ -4,11 +4,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CountdownTimer_Script : MonoBehaviour
+public class Timer_Script : MonoBehaviour
 {
-    public float startingTime = 120.0f;
+    private float startingTime;
     private float currentTime;
-    [SerializeField] private TextMeshProUGUI countDownText;
+    [SerializeField] private TextMeshProUGUI timerText;
 
     public CarController_Script CarControllerScript;
     
@@ -19,14 +19,14 @@ public class CountdownTimer_Script : MonoBehaviour
 
     private void Update()
     {
-        if (currentTime > 0)
+        if (CarControllerScript.currentHealth == 0)
         {
-            currentTime -= 1 * Time.deltaTime;
-            countDownText.text = "Timer: " + currentTime.ToString("0.00");
+            timerText.text = "Timer: " + currentTime.ToString("0.00");
         }
         else
         {
-            CarControllerScript.gameObject.SetActive(false);
+            currentTime += 1 * Time.deltaTime;
+            timerText.text = "Timer: " + currentTime.ToString("0.00");
         }
     }
 }
