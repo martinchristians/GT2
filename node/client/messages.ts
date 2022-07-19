@@ -55,7 +55,7 @@ export type GameMessage = {
     }
   | {
       type: 'level_started'
-      layout: 'default' | GamepadLayout
+      layout: 'default' | 'jump' | GamepadLayout
     }
   | {
       type: 'main_menu_opened'

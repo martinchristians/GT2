@@ -277,7 +277,8 @@ export const schemaGameMessage: Schema = {
                 },
                 {
                   "enum": [
-                    "default"
+                    "default",
+                    "jump"
                   ],
                   "type": "string"
                 }

@@ -10,6 +10,7 @@
   import GameHeader from './components/game-header.svelte'
   import Gamepad from './components/gamepad.svelte'
   import defaultLayout from './default-layout'
+  import jumpLayout from './jump-layout'
   import Join, { JoinEvent } from './views/join.svelte'
 
   let view = 'join'
@@ -82,6 +83,8 @@
       disabledButtons = disabledButtons
       if (msg.layout == 'default') {
         buttonLayout = defaultLayout
+      } else if (msg.layout == 'jump') {
+        buttonLayout = jumpLayout
       } else {
         buttonLayout = msg.layout
       }
