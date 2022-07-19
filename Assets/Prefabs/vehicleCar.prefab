@@ -470,6 +470,7 @@ MonoBehaviour:
   HealthBarScript: {fileID: 502633465718798443}
   shields: {fileID: 5261340116772391156}
   shields_b: 0
+  VehicleScript: {fileID: 2365087100224260640}
   anim: {fileID: 6379947651924257525}
 --- !u!114 &502633465718798443
 MonoBehaviour:

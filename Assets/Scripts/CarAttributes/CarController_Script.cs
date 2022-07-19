@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using KenCars;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +15,7 @@ public class CarController_Script: MonoBehaviour
     public GameObject shields;
     [SerializeField] private bool shields_b;
 
+    public Vehicle VehicleScript;
     public Animator anim;
     
     private void Start()
@@ -91,6 +93,10 @@ public class CarController_Script: MonoBehaviour
                 currentHealth += 1;
                 Destroy(collision.gameObject);
             }
+        } else if (collision.gameObject.name == "SpeedPad")
+        {
+            Debug.Log("accelerate");
+            VehicleScript.sphere.velocity = Vector3.forward * 25;
         }
     }
 
