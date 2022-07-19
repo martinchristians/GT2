@@ -239,6 +239,9 @@ export const schemaGameMessage: Schema = {
             },
             "paused": {
               "type": "boolean"
+            },
+            "player": {
+              "type": "number"
             }
           },
           "required": [

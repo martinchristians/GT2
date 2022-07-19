@@ -13,7 +13,11 @@
   import Join, { JoinEvent } from './views/join.svelte'
 
   let view = 'join'
-  let paused = false
+  let paused = 0
+  let me = {
+    name: '',
+    id: -1,
+  }
   let players: Player[] = []
   let buttonLayout: GamepadLayout = defaultLayout
   let disabledButtons = new Set<string>()
@@ -25,6 +29,7 @@
     error = null
     const { roomCode, playerName } = e.detail
     // create new url with search params
+    me.name = playerName
 
     const locationUrl = new URL(window.location.href)
 
@@ -54,6 +59,9 @@
         id: msg.id,
         name: msg.name,
       }
+      if (msg.name === me.name) {
+        me.id = msg.id
+      }
     } else if (msg.type === 'player_left') {
       players[msg.id] = undefined
     } else if (msg.type === 'game_disconnected') {
@@ -62,10 +70,14 @@
     } else if (msg.type === 'invalid_message') {
       console.error('Invalid message:', msg)
     } else if (msg.type === 'set_paused') {
-      paused = msg.paused
+      if (msg.paused === false) {
+        paused = 0
+      } else {
+        paused = msg.player == me.id ? 1 : 2
+      }
     } else if (msg.type === 'level_started') {
       view = 'game'
-      paused = false
+      paused = 0
       disabledButtons.clear()
       disabledButtons = disabledButtons
       if (msg.layout == 'default') {
