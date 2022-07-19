@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using KenCars;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,14 +12,16 @@ public class CarController_Script: MonoBehaviour
     private int shieldNumber = 2;
     
     public HealthBar_Script HealthBarScript;
-    private GameObject shields;
+    public GameObject shields;
     [SerializeField] private bool shields_b;
 
+    public Vehicle VehicleScript;
+    public Animator anim;
+    
     private void Start()
     {
         currentHealth = maxHealth;
         HealthBarScript.SetMaxHealth(maxHealth);
-        shields = GameObject.Find("Shields");
         shields_b = false;
     }
 
@@ -26,8 +29,8 @@ public class CarController_Script: MonoBehaviour
     {
         if (collision.gameObject.name == "Wall")
         {
-            Debug.Log("COLLIDE");
-
+            Debug.Log("COLLIDE WALL");
+            // if user has shield, then get neither damage nor disadvantage effect 
             if (shields_b == true)
             {
                 shields.transform.GetChild(shieldNumber).gameObject.GetComponent<Image>().enabled = false;
@@ -41,10 +44,27 @@ public class CarController_Script: MonoBehaviour
             else
             {
                 TakeDamage(1);
-
+                
                 if (HealthBarScript.slider.value == 0)
                 {
-                    gameObject.SetActive(false);
+                    // destroy spawn vehicle
+                    //Destroy(transform.parent.gameObject);
+                    
+                    // hide vehicle
+                    transform.parent.gameObject.transform.GetChild(1).gameObject.SetActive(false);
+                }
+                else
+                {
+                    if (collision.gameObject.tag == "Damage Wall")
+                    {
+                        Debug.Log("Collide with normal wall");
+                    }
+                    else if (collision.gameObject.tag == "BigSmall Wall")
+                    {
+                        Debug.Log("Collide with BigSmall wall");
+                        anim.Play("BigSmall");
+                        currentHealth += 1;
+                    }
                 }
             }
         }
@@ -54,7 +74,7 @@ public class CarController_Script: MonoBehaviour
     {
         if (collision.gameObject.name == "Shield")
         {
-            Debug.Log("PROTECTION");
+            Debug.Log("shield active");
             
             shields_b = true;
             for (int i = 0; i < 3; i++)
@@ -62,6 +82,21 @@ public class CarController_Script: MonoBehaviour
                 shields.transform.GetChild(i).gameObject.GetComponent<Image>().enabled = true;
             }
             Destroy(collision.gameObject);
+        } else if (collision.gameObject.name == "Health")
+        {
+            Debug.Log("collide health");
+            
+            if (currentHealth < 3)
+            {
+                Debug.Log("add one life");
+                HealthBarScript.slider.value += 1;
+                currentHealth += 1;
+                Destroy(collision.gameObject);
+            }
+        } else if (collision.gameObject.name == "SpeedPad")
+        {
+            Debug.Log("accelerate");
+            VehicleScript.sphere.velocity = Vector3.forward * 25;
         }
     }
 
