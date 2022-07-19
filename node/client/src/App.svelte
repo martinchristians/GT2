@@ -25,8 +25,10 @@
     error = null
     const { roomCode, playerName } = e.detail
     // create new url with search params
-    const host = 'ws://localhost:3000'
-    const url = new URL(`${host}/joinGame`)
+
+    const locationUrl = new URL(window.location.href)
+
+    const url = new URL(`ws://${locationUrl.hostname}:3000/joinGame`)
     url.searchParams.set('room', roomCode)
     url.searchParams.set('name', playerName)
     socket = new WebSocket(url)
