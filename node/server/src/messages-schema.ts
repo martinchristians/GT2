@@ -86,19 +86,7 @@ export const schemaServerMessage: Schema = {
         "players": {
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "name": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "name"
-            ]
+            "$ref": "#/definitions/Player"
           }
         }
       },
@@ -130,6 +118,23 @@ export const schemaServerMessage: Schema = {
       ]
     }
   ],
+  "definitions": {
+    "Player": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    }
+  },
   "$schema": "http://json-schema.org/draft-07/schema#"
 }
 
@@ -150,6 +155,38 @@ export const schemaClientMessage: Schema = {
       },
       "required": [
         "pause",
+        "type"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "return_to_menu"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "start_level"
+          ]
+        },
+        "level": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "level",
         "type"
       ]
     },
@@ -186,7 +223,7 @@ export const schemaGameMessage: Schema = {
         {
           "type": "object",
           "properties": {
-            "recepient": {
+            "recipient": {
               "type": "number"
             }
           }
@@ -197,7 +234,7 @@ export const schemaGameMessage: Schema = {
             "type": {
               "type": "string",
               "enum": [
-                "game_paused"
+                "set_paused"
               ]
             },
             "paused": {
@@ -216,7 +253,7 @@ export const schemaGameMessage: Schema = {
         {
           "type": "object",
           "properties": {
-            "recepient": {
+            "recipient": {
               "type": "number"
             }
           }
@@ -227,18 +264,87 @@ export const schemaGameMessage: Schema = {
             "type": {
               "type": "string",
               "enum": [
-                "enable_button"
+                "level_started"
               ]
             },
-            "button": {
-              "type": "string"
+            "layout": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/GamepadLayout"
+                },
+                {
+                  "enum": [
+                    "default"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "required": [
+            "layout",
+            "type"
+          ]
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "recipient": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "main_menu_opened"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ]
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "recipient": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "set_buttons"
+              ]
+            },
+            "buttons": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "enabled": {
               "type": "boolean"
             }
           },
           "required": [
-            "button",
+            "buttons",
             "enabled",
             "type"
           ]
@@ -246,5 +352,81 @@ export const schemaGameMessage: Schema = {
       ]
     }
   ],
+  "definitions": {
+    "GamepadLayout": {
+      "type": "object",
+      "properties": {
+        "gridAreas": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gridColumns": {
+          "type": "string"
+        },
+        "gridRows": {
+          "type": "string"
+        },
+        "buttons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GamepadButton"
+          }
+        }
+      },
+      "required": [
+        "buttons",
+        "gridAreas",
+        "gridColumns",
+        "gridRows"
+      ]
+    },
+    "GamepadButton": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "color": {
+          "$ref": "#/definitions/ButtonColor"
+        },
+        "icon": {
+          "$ref": "#/definitions/ButtonIcon"
+        }
+      },
+      "required": [
+        "color",
+        "icon",
+        "name"
+      ]
+    },
+    "ButtonColor": {
+      "enum": [
+        "blue",
+        "green",
+        "neon",
+        "orange",
+        "pink",
+        "purple",
+        "red",
+        "yellow"
+      ],
+      "type": "string"
+    },
+    "ButtonIcon": {
+      "enum": [
+        "flip",
+        "go",
+        "jump",
+        "left",
+        "right",
+        "signal-left",
+        "signal-right",
+        "stop"
+      ],
+      "type": "string"
+    }
+  },
   "$schema": "http://json-schema.org/draft-07/schema#"
 }

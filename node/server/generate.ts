@@ -22,6 +22,16 @@ const program = TJS.getProgramFromFiles(
   basePath,
 )
 
+// copy ./src/messages.ts to ../client/src/messages.ts but replace first line with // @ts-ignore
+const messagesFile = resolve('./src/messages.ts')
+const messagesClientFile = resolve('../client/messages.ts')
+const messagesClientFileContent = fs.readFileSync(messagesFile, 'utf8')
+const messagesClientFileContentLines = messagesClientFileContent.split('\n')
+messagesClientFileContentLines[0] =
+  '// This is a generated file. Do not edit. Look at server/src/messages.ts for the source.'
+const messagesClientFileContentNew = messagesClientFileContentLines.join('\n')
+fs.writeFileSync(messagesClientFile, messagesClientFileContentNew)
+
 const generator = TJS.buildGenerator(program, settings)
 
 if (!generator) {

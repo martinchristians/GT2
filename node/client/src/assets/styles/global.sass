@@ -1,6 +1,17 @@
 @use './variables.sass'
 @use './fonts.sass'
 
+body, html, main
+  height: 100vh
+
+*
+  padding: 0
+  margin: 0
+
+h2
+  color: var(--wds-light-grey-60)
+  font-size: 16px
+
 button, input, textarea
   font-size: inherit
   font-family: inherit
@@ -10,7 +21,39 @@ button, input, textarea
   background: transparent
 
 body
-  background: var(--wds-dark-grey-70)
   color: var(--wds-light-grey-05)
   font-family: 'Inter'
   font-size: 20px
+
+main
+  box-sizing: border-box
+  display: flex
+  flex-direction: column
+  gap: 16px
+  background-color: var(--wds-dark-grey-70)
+  background-image: url(background.jpg)
+  background-size: 200px
+  padding: 16px
+  box-shadow: inset 0px 0px 128px rgba(0, 0, 0, 1.0)
+
+.hbox
+  display: flex
+  flex-direction: row
+  gap: 16px
+  overflow: hidden
+
+.grow
+  flex: 1
+
+.scroll
+  overflow-y: auto
+  padding: 16px
+  box-shadow: inset 0px 0px 128px rgba(0, 0, 0, 1.0)
+
+section
+  border-radius: 16px
+  padding: 16px
+  flex: 1
+  border: 1.5px solid var(--wds-genuine-black)
+  box-shadow: inset 0px 0px 0px 1.5px rgba(255, 255, 255, 0.2)
+  box-sizing: border-box

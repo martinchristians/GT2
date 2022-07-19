@@ -4,6 +4,11 @@
   "exclude": ["node_modules/*", "__sapper__/*", "public/*"],
   "moduleResolution": "node",
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "*": ["src/*"],
+      "@server/*": ["*"]
+    },
     "types": ["svelte"],
     "target": "es2019"
   }

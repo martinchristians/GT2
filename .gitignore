@@ -140,3 +140,6 @@ Assets/ImportedAssets
 Assets/PathCreator
 /Assets/ImportedAssets.meta
 /Assets/PathCreator.meta
+
+runClient.bat
+runServer.bat

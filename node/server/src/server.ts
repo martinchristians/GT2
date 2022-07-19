@@ -47,14 +47,13 @@ export default class {
           return
         }
 
-        const room = this.roomManager.getRoom(roomCode)
+        const room = this.roomManager.getRoom(roomCode.toUpperCase())
         if (!room) {
           socket.destroy()
           return
         }
         this.websocketServer.handleUpgrade(request, socket, head, (socket) => {
           room.addPlayer(socket as RoomWebSocket, playerName)
-          socket.on('message', (message) => console.log(message))
         })
         return
       }

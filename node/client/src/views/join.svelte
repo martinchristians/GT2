@@ -28,20 +28,24 @@
   }
 </script>
 
-<div>
+<form on:submit|preventDefault={join}>
   {@html Logo}
   {#if error}
     <div class="error">{error}</div>
   {/if}
   <TextField label="Room code" bind:value={roomCode} />
   <TextField label="Your name" bind:value={playerName} />
-  <ArcadeButton {disabled} on:click={join}>Join</ArcadeButton>
-</div>
+  <ArcadeButton {disabled}>Join</ArcadeButton>
+</form>
 
 <style lang="sass">
-  div
+  form
+    :global(> svg)
+      width: 100%
     flex-direction: column
-    margin: 32px
+    padding: 32px
     display: flex
     gap: 16px
+    overflow-y: auto
+    min-height: min-content
 </style>

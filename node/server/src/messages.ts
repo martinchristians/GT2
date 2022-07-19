@@ -19,10 +19,7 @@ export type ServerMessage =
     }
   | {
       type: 'list_players'
-      players: {
-        id: number
-        name: string
-      }[]
+      players: Player[]
     }
   | {
       type: 'invalid_message'
@@ -36,21 +33,78 @@ export type ClientMessage =
       pause: boolean
     }
   | {
+      type: 'return_to_menu'
+    }
+  | {
+      type: 'start_level'
+      level: number
+    }
+  | {
       type: 'button_pressed'
       button: string
       pressed: boolean
     }
 
 export type GameMessage = {
-  recepient?: number
+  recipient?: number
 } & (
   | {
-      type: 'game_paused'
+      type: 'set_paused'
       paused: boolean
     }
   | {
-      type: 'enable_button'
-      button: string
+      type: 'level_started'
+      layout: 'default' | GamepadLayout
+    }
+  | {
+      type: 'main_menu_opened'
+    }
+  | {
+      type: 'set_buttons'
+      buttons: string[]
       enabled: boolean
     }
 )
+
+// ----- subtypes -----
+// when writing messages in JSON, enum values just use the string value
+
+export interface Player {
+  id: number
+  name: string
+}
+
+export interface GamepadLayout {
+  gridAreas: string[]
+  gridColumns: string
+  gridRows: string
+  buttons: GamepadButton[]
+}
+
+export interface GamepadButton {
+  name: string
+  color: ButtonColor
+  icon: ButtonIcon
+}
+
+export enum ButtonColor {
+  Blue = 'blue',
+  Neon = 'neon',
+  Green = 'green',
+  Yellow = 'yellow',
+  Red = 'red',
+  Orange = 'orange',
+  Pink = 'pink',
+  Purple = 'purple',
+}
+
+export enum ButtonIcon {
+  Flip = 'flip',
+  Go = 'go',
+  Jump = 'jump',
+  Left = 'left',
+  Right = 'right',
+  SignalLeft = 'signal-left',
+  SignalRight = 'signal-right',
+  Stop = 'stop',
+}
