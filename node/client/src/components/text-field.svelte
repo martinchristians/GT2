@@ -4,6 +4,7 @@
   export let label: string
   export let value = null
   export let disabled = false
+  export let uppercase = false
 
   export let placeholder: string | null = null
 
@@ -12,7 +13,7 @@
 
 <div>
   <label for={inputId}>{label}</label>
-  <input id={inputId} type="input" bind:value {placeholder} {disabled} />
+  <input id={inputId} type="input" bind:value {placeholder} {disabled} class={uppercase ? 'uppercase' : ''} />
 </div>
 
 <style lang="sass">
@@ -26,4 +27,6 @@
     border: 1px solid var(--wds-genuine-black)
     box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2)
     border-radius: 8px
+    &.uppercase
+      text-transform: uppercase
 </style>

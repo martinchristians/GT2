@@ -18,7 +18,7 @@
   const iconsLeft = [DbIconLeft, DbIconFuel]
   const iconsRight = [DbIconMotor, DbIconRight]
 
-  export let paused: boolean
+  export let paused: number
   export let gameRunning: boolean
 
   function toggleFullscreen() {
@@ -57,10 +57,10 @@
   <ArcadeButton
     icon={true}
     disabled={!gameRunning}
-    variant={gameRunning && !paused ? ButtonColor.Yellow : ButtonColor.Green}
+    variant={gameRunning && paused < 1 ? ButtonColor.Yellow : ButtonColor.Green}
     on:click={() => dispatch('pause')}
   >
-    {#if gameRunning && !paused}
+    {#if gameRunning && paused < 1}
       {@html IconPause}
     {:else}
       {@html IconPlay}

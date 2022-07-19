@@ -51,6 +51,7 @@ export type GameMessage = {
   | {
       type: 'set_paused'
       paused: boolean
+      player?: number
     }
   | {
       type: 'level_started'

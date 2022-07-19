@@ -47,7 +47,7 @@
     Stop = 'stop',
   }
 
-  export let paused: boolean
+  export let paused: number
   export let buttonLayout: GamepadLayout
   export let disabledButtons: Set<string>
 </script>
@@ -71,15 +71,19 @@ grid-template-rows: ${buttonLayout.gridRows};
       variant={button.color}>{@html getIcon(button.icon)}</ArcadeButton
     >
   {/each}
-  {#if paused}
+  {#if paused > 0}
     <div class="pausemenu">
       <h1>Paused</h1>
       <div class="actions">
         <ArcadeButton
           variant={ButtonColor.Red}
+          disabled={paused != 1}
           on:click={() => dispatch('toMenu')}>Back to Menu</ArcadeButton
         >
-        <ArcadeButton on:click={() => dispatch('unpause')}>Resume</ArcadeButton>
+        <ArcadeButton
+          disabled={paused != 1}
+          on:click={() => dispatch('unpause')}>Resume</ArcadeButton
+        >
       </div>
     </div>
   {/if}
