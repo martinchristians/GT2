@@ -80,6 +80,17 @@ public class CarController_Script: MonoBehaviour
                 shields.transform.GetChild(i).gameObject.GetComponent<Image>().enabled = true;
             }
             Destroy(collision.gameObject);
+        } else if (collision.gameObject.name == "Health")
+        {
+            Debug.Log("collide health");
+            
+            if (currentHealth < 3)
+            {
+                Debug.Log("add one life");
+                HealthBarScript.slider.value += 1;
+                currentHealth += 1;
+                Destroy(collision.gameObject);
+            }
         }
     }
 
