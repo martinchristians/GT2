@@ -33,7 +33,7 @@
   {#if error}
     <div class="error">{error}</div>
   {/if}
-  <TextField label="Room code" bind:value={roomCode} />
+  <TextField label="Room code" uppercase={true} bind:value={roomCode} />
   <TextField label="Your name" bind:value={playerName} />
   <ArcadeButton {disabled}>Join</ArcadeButton>
 </form>
