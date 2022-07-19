@@ -22,22 +22,30 @@ namespace Communication {
         public static bool connected => !string.IsNullOrWhiteSpace(roomCode);
 
         public static bool ButtonIsPressed (string button) {
+            buttonStateHasUnqueriedUpdates[button] = false;
             if(buttonPressed.TryGetValue(button, out var output)){
                 return output;
             }
             return false;
         }
 
+        public static bool ButtonWasPressedSinceLastQuery (string button) {
+            if(!buttonStateHasUnqueriedUpdates[button]) return false;
+            return ButtonIsPressed(button);
+        }
+
         public static void ResetButtonsPressed () {
-            buttonPressed = buttonPressed ?? new Dictionary<string, bool>();
             buttonPressed.Clear();
+            buttonStateHasUnqueriedUpdates.Clear();
             foreach(var button in Button.all){
                 buttonPressed[button] = false;
+                buttonStateHasUnqueriedUpdates[button] = false;
             }
         }
 
         private static ClientWebSocket socket;
         private static Dictionary<string, bool> buttonPressed = new Dictionary<string, bool>();
+        private static Dictionary<string, bool> buttonStateHasUnqueriedUpdates = new Dictionary<string, bool>();
 
         private static List<PlayerData> _connectedPlayers = new List<PlayerData>();
         public static IReadOnlyList<PlayerData> connectedPlayers => _connectedPlayers;
@@ -84,6 +92,7 @@ namespace Communication {
                         break;
                     case "button_pressed":
                         buttonPressed[data.button] = data.pressed;
+                        buttonStateHasUnqueriedUpdates[data.button] = true;
                         break;
                     case "player_joined":
                         var newPlayer = new PlayerData(){
@@ -148,17 +157,21 @@ namespace Communication {
             }));
         }
 
-        public static async void SendLevelStarted (int playerId = -1) {
+        public static async void SendLevelStarted (GamepadLayout layout) {
+            SendLevelStarted(-1, layout);
+        }
+
+        public static async void SendLevelStarted (int playerId, GamepadLayout layout) {
             if(playerId < 0){
                 await SendMessage(JsonUtility.ToJson(new BroadcastGameMessage(){
                     type = "level_started",
-                    layout = "default"  // TODO gamepadlayout?
+                    layout = "default"
                 }));
             }else{
                 await SendMessage(JsonUtility.ToJson(new TargetedGameMessage(){
                     recipient = playerId,
                     type = "level_started",
-                    layout = "default"  // TODO gamepadlayout?
+                    layout = "default"
                 }));
             }
         }

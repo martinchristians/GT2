@@ -19,7 +19,8 @@ namespace CoreSystems {
         int m_nextScene = -1;
         List<PlayerData> m_currentLevelPlayers = new List<PlayerData>();
 
-        bool isInLevel => UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex > 0;
+        bool isInLevel => SceneManager.GetActiveScene().buildIndex > 0;
+        GamepadLayout currentLayout => (SceneManager.GetActiveScene().buildIndex == 3) ? GamepadLayout.jump : GamepadLayout.standard;
 
         public static bool isPaused { get; private set; }
         public static PlayerData pausedByPlayerData { get; private set; }
@@ -71,7 +72,7 @@ namespace CoreSystems {
                 if(m_loading || !isInLevel){
                     return;
                 }
-                GameClient.SendLevelStarted(newPlayer.id);
+                GameClient.SendLevelStarted(newPlayer.id, currentLayout);
                 GameClient.SendButtonsEnabled(newPlayer.id, Button.all, false);
             }
 
@@ -107,7 +108,7 @@ namespace CoreSystems {
             yield return SceneManager.LoadSceneAsync(sceneIndex);
             if(sceneIndex > MAIN_MENU_SCENE_INDEX){
                 GameClient.ResetButtonsPressed();
-                GameClient.SendLevelStarted();
+                GameClient.SendLevelStarted(currentLayout);
                 m_currentLevelPlayers.Clear();
                 var otherPlayers = new List<PlayerData>();
                 foreach(var player in GameClient.connectedPlayers){

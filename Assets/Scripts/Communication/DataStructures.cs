@@ -76,12 +76,14 @@ namespace Communication {
         public const string right = "right";
         public const string forward = "go";
         public const string back = "stop";
+        public const string jump = "jump";
 
         public static IEnumerable<string> all { get {
             yield return left;
             yield return right;
             yield return forward;
             yield return back;
+            yield return jump;
         } }
 
         public static IEnumerable<string> GetOpposite (IEnumerable<string> inputButtons) {
@@ -94,6 +96,21 @@ namespace Communication {
 
     }
 
+    public class GamepadLayout {
 
+        public static readonly GamepadLayout standard = new GamepadLayout("default");
+        public static readonly GamepadLayout jump = new GamepadLayout("jump");
+
+        private readonly string layoutId;
+
+        private GamepadLayout (string layoutId) {
+            this.layoutId = layoutId;
+        }
+
+        public override string ToString () {
+            return layoutId;
+        }
+
+    }
 
 }

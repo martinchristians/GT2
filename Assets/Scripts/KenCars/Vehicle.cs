@@ -130,7 +130,7 @@ namespace KenCars {
             
             // Jump
             
-            if(Input.GetKeyDown(jump)){ ControlJump(); }
+            if(Input.GetKeyDown(jump) || Communication.GameClient.ButtonWasPressedSinceLastQuery(Communication.Button.jump)){ ControlJump(); }
             
             // Wheel and body tilt
             

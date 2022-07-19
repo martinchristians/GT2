@@ -5,9 +5,9 @@ namespace UI {
 
     public class TempRoomCodeDisplay : MonoBehaviour {
 
-        // probably make something fancier, with a nice canvas and stuff.
+        // do we keep this for showing the room code when we're in a level? probably not, but in case, imma keep it. long complicated script and all that...
         
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void CreateInstance () {
             var newGO = new GameObject($"[{nameof(TempRoomCodeDisplay)}]", typeof(TempRoomCodeDisplay));
             DontDestroyOnLoad(newGO);
