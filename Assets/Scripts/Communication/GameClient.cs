@@ -125,10 +125,11 @@ namespace Communication {
             );
         }
 
-        public static async void UpdatePauseState (bool value) {
+        public static async void UpdatePauseState (int playerId, bool value) {
             await SendMessage(JsonUtility.ToJson(new BroadcastGameMessage(){
                 type = "set_paused",
-                paused = value
+                paused = value,
+                player = playerId
             }));
         }
 

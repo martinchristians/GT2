@@ -148,7 +148,7 @@ namespace CoreSystems {
             isPaused = true;
             pausedByPlayerData = pausePlayer;
             UI.PauseMenu.instance.Show(pausePlayer.name);
-            GameClient.UpdatePauseState(true);
+            GameClient.UpdatePauseState(pausePlayer.id, true);
             Time.timeScale = 0f;
         }
 
@@ -156,7 +156,7 @@ namespace CoreSystems {
             isPaused = false;
             pausedByPlayerData = default;
             UI.PauseMenu.instance.Hide();
-            GameClient.UpdatePauseState(false);
+            GameClient.UpdatePauseState(-1, false);
             Time.timeScale = 1f;
         }
 

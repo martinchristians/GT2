@@ -7,6 +7,7 @@ namespace Communication {
     [System.Serializable]
     struct BroadcastGameMessage {
 
+        [SerializeField] public int player;
         [SerializeField] public string type;
         [SerializeField] public bool paused;
         [SerializeField] public string[] buttons;
@@ -18,6 +19,7 @@ namespace Communication {
     [System.Serializable]
     struct TargetedGameMessage {
 
+        [SerializeField] public int player;
         [SerializeField] public int recipient;
         [SerializeField] public string type;
         [SerializeField] public bool paused;
