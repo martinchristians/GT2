@@ -136,8 +136,5 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,unity
 
-Assets/ImportedAssets
-/Assets/ImportedAssets.meta
-
 runClient.bat
 runServer.bat
