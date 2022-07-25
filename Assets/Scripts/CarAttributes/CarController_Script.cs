@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using KenCars;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +18,8 @@ public class CarController_Script: MonoBehaviour
 
     public Vehicle VehicleScript;
     public Animator anim;
+
+    public ShowMedal ShowMedal;
     
     private void Start()
     {
@@ -44,7 +47,7 @@ public class CarController_Script: MonoBehaviour
             else
             {
                 TakeDamage(1);
-                
+
                 if (HealthBarScript.slider.value == 0)
                 {
                     // destroy spawn vehicle
@@ -55,6 +58,14 @@ public class CarController_Script: MonoBehaviour
                 }
                 else
                 {
+                    // show medal
+                    ShowMedal.CallMedal();
+                    ShowMedal.medalObj.GetComponent<Image>().sprite = ShowMedal.spriteMedal;
+                    ShowMedal.medalObj.GetComponent<Image>().enabled = true;
+                    
+                    ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = ShowMedal.quote;
+                    ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
+                    
                     if (collision.gameObject.tag == "Damage Wall")
                     {
                         Debug.Log("Collide with normal wall");
@@ -65,6 +76,8 @@ public class CarController_Script: MonoBehaviour
                         anim.Play("BigSmall");
                         currentHealth += 1;
                     }
+                    
+                    StartCoroutine(SetInactive());
                 }
             }
         }
@@ -104,5 +117,12 @@ public class CarController_Script: MonoBehaviour
     {
         currentHealth -= damage;
         HealthBarScript.SetHealth(currentHealth);
+    }
+    
+    IEnumerator SetInactive()
+    {
+        yield return new WaitForSeconds(4f);
+        ShowMedal.medalObj.GetComponent<Image>().enabled = false;
+        ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = false;
     }
 }
