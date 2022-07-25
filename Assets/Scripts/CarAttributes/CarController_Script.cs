@@ -30,12 +30,13 @@ public class CarController_Script: MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name == "Wall")
+        if (collision.gameObject.name != "Ground")
         {
-            Debug.Log("COLLIDE WALL");
+            Debug.Log("COLLIDE");
             // if user has shield, then get neither damage nor disadvantage effect 
             if (shields_b == true)
             {
+                CallMedal();
                 shields.transform.GetChild(shieldNumber).gameObject.GetComponent<Image>().enabled = false;
                 shieldNumber -= 1;
 
@@ -58,13 +59,7 @@ public class CarController_Script: MonoBehaviour
                 }
                 else
                 {
-                    // show medal
-                    ShowMedal.CallMedal();
-                    ShowMedal.medalObj.GetComponent<Image>().sprite = ShowMedal.spriteMedal;
-                    ShowMedal.medalObj.GetComponent<Image>().enabled = true;
-                    
-                    ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = ShowMedal.quote;
-                    ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
+                    CallMedal();
                     
                     if (collision.gameObject.tag == "Damage Wall")
                     {
@@ -73,11 +68,14 @@ public class CarController_Script: MonoBehaviour
                     else if (collision.gameObject.tag == "BigSmall Wall")
                     {
                         Debug.Log("Collide with BigSmall wall");
+                        SetUpZPosition();
                         anim.Play("BigSmall");
-                        currentHealth += 1;
                     }
-                    
-                    StartCoroutine(SetInactive());
+                    else if (collision.gameObject.tag == "Cone")
+                    {
+                        Debug.Log("Collide with Road Cone");
+                        Destroy(collision.gameObject);
+                    }
                 }
             }
         }
@@ -118,7 +116,29 @@ public class CarController_Script: MonoBehaviour
         currentHealth -= damage;
         HealthBarScript.SetHealth(currentHealth);
     }
-    
+
+    void SetUpZPosition()
+    {
+        Vector3 pos = gameObject.transform.position;
+        for (int i = 1; i < 4; i++)
+        {
+            transform.parent.gameObject.transform.GetChild(i).gameObject.transform.position =
+                pos + new Vector3(0, 0, -1);
+        }
+    }
+
+    void CallMedal()
+    {
+        ShowMedal.CallMedal();
+        ShowMedal.medalObj.GetComponent<Image>().sprite = ShowMedal.spriteMedal;
+        ShowMedal.medalObj.GetComponent<Image>().enabled = true;
+                    
+        ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = ShowMedal.quote;
+        ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
+        
+        StartCoroutine(SetInactive());
+    }
+
     IEnumerator SetInactive()
     {
         yield return new WaitForSeconds(4f);
