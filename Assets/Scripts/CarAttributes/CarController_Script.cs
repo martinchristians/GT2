@@ -36,8 +36,11 @@ public class CarController_Script: MonoBehaviour
         if (collision.gameObject.name != "Ground")
         {
             Debug.Log("COLLIDE");
-            // if user has shield, then get neither damage nor disadvantage effect 
-            if (shields_b == true)
+            if (collision.gameObject.tag == "TheEnd")
+            {
+                ResetScene();
+            }
+            else if (shields_b == true) // if user has shield, then get neither damage nor disadvantage effect 
             {
                 CallMedal();
                 shields.transform.GetChild(shieldNumber).gameObject.GetComponent<Image>().enabled = false;
@@ -73,12 +76,8 @@ public class CarController_Script: MonoBehaviour
                     else if (collision.gameObject.tag == "Cone")
                     {
                         Debug.Log("Collide with Road Cone");
-                        Destroy(collision.gameObject);
                         VehicleScript.sphere.velocity = Vector3.Lerp(VehicleScript.sphere.velocity, Vector3.zero, Time.deltaTime * 1000f);
-                    }
-                    else if (collision.gameObject.tag == "TheEnd")
-                    {
-                        ResetScene();
+                        collision.gameObject.GetComponent<Rigidbody>().AddForce(Vector3.back * 5000.0f);
                     }
                 }
             }
