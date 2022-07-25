@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using KenCars;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CarController_Script: MonoBehaviour
@@ -26,6 +27,8 @@ public class CarController_Script: MonoBehaviour
         currentHealth = maxHealth;
         HealthBarScript.SetMaxHealth(maxHealth);
         shields_b = false;
+
+        anim.Play("FadeIn");
     }
 
     void OnCollisionEnter(Collision collision)
@@ -51,11 +54,7 @@ public class CarController_Script: MonoBehaviour
 
                 if (HealthBarScript.slider.value == 0)
                 {
-                    // destroy spawn vehicle
-                    //Destroy(transform.parent.gameObject);
-                    
-                    // hide vehicle
-                    transform.parent.gameObject.transform.GetChild(1).gameObject.SetActive(false);
+                    ResetScene();
                 }
                 else
                 {
@@ -76,6 +75,10 @@ public class CarController_Script: MonoBehaviour
                         Debug.Log("Collide with Road Cone");
                         Destroy(collision.gameObject);
                         VehicleScript.sphere.velocity = Vector3.Lerp(VehicleScript.sphere.velocity, Vector3.zero, Time.deltaTime * 1000f);
+                    }
+                    else if (collision.gameObject.tag == "TheEnd")
+                    {
+                        ResetScene();
                     }
                 }
             }
@@ -145,5 +148,11 @@ public class CarController_Script: MonoBehaviour
         yield return new WaitForSeconds(4f);
         ShowMedal.medalObj.GetComponent<Image>().enabled = false;
         ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = false;
+    }
+
+    void ResetScene()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.name);
     }
 }
