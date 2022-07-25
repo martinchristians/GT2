@@ -61,13 +61,13 @@ public class CarController_Script: MonoBehaviour
                 {
                     CallMedal();
                     
-                    if (collision.gameObject.tag == "Damage Wall")
+                    if (collision.gameObject.tag == "Damage")
                     {
-                        Debug.Log("Collide with normal wall");
+                        Debug.Log("Collide normally");
                     }
-                    else if (collision.gameObject.tag == "BigSmall Wall")
+                    else if (collision.gameObject.tag == "BigSmall")
                     {
-                        Debug.Log("Collide with BigSmall wall");
+                        Debug.Log("Collide with BigSmall Effect");
                         SetUpZPosition();
                         anim.Play("BigSmall");
                     }
@@ -75,6 +75,7 @@ public class CarController_Script: MonoBehaviour
                     {
                         Debug.Log("Collide with Road Cone");
                         Destroy(collision.gameObject);
+                        VehicleScript.sphere.velocity = Vector3.Lerp(VehicleScript.sphere.velocity, Vector3.zero, Time.deltaTime * 1000f);
                     }
                 }
             }

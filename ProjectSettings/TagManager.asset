@@ -4,9 +4,10 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Undefined
-  - Damage Wall
-  - BigSmall Wall
+  - Normal
+  - BigSmall
+  - Cone
+  - TheEnd
   layers:
   - Default
   - TransparentFX
