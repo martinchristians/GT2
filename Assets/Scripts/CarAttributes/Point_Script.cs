@@ -30,7 +30,9 @@ public class Point_Script : MonoBehaviour
             currentPoint = gameObject.transform.position.z;
 
             float distance = Mathf.Abs(startingPoint - currentPoint);
-            if (currentPoint < startingPoint)
+            if (distance > 15) // reset scene when car move backward too far
+                CarControllerScript.ResetScene();
+            else if (currentPoint < startingPoint)
             {
                 pointText.text = "Punkte: 00";
                 animUTurn.Play("UTurn");

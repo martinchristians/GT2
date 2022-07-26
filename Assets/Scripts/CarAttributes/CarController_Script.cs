@@ -151,7 +151,7 @@ public class CarController_Script : MonoBehaviour
         ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = false;
     }
 
-    void ResetScene()
+    public void ResetScene()
     {
         Scene scene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(scene.name);
