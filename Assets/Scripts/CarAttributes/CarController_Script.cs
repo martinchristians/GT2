@@ -12,6 +12,7 @@ public class CarController_Script : MonoBehaviour
     public int maxHealth = 3;
     public int currentHealth;
     private int shieldNumber = 2;
+    private bool damage = true;
 
     public HealthBar_Script HealthBarScript;
     public GameObject shields;
@@ -20,7 +21,10 @@ public class CarController_Script : MonoBehaviour
     public Vehicle VehicleScript;
     public Animator anim;
 
-    public ShowMedal ShowMedal;
+    private ShowMedal showMedal;
+    private CollectCoin collectCoin;
+    public Point_Script points;
+
 
     private void Start()
     {
@@ -29,13 +33,18 @@ public class CarController_Script : MonoBehaviour
         shields_b = false;
 
         anim.Play("FadeIn");
+
+        showMedal = new ShowMedal();
+        collectCoin = new CollectCoin();
+        points = this.GetComponent<Point_Script>();
     }
 
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag != "Ground")
         {
-            Debug.Log("COLLIDE");
+            Debug.Log("Collided with: " + collision.gameObject.name);
+
             if (collision.gameObject.tag == "TheEnd")
             {
                 ResetScene();
@@ -114,6 +123,12 @@ public class CarController_Script : MonoBehaviour
             Debug.Log("accelerate");
             VehicleScript.sphere.velocity = Vector3.forward * 25;
         }
+        else if (collision.gameObject.tag == "Coin")
+        {
+            collision.gameObject.SetActive(false);
+            collectCoin.Collect();
+            points.IncreasePoints();
+        }
     }
 
     void TakeDamage(int damage)
@@ -134,12 +149,12 @@ public class CarController_Script : MonoBehaviour
 
     void CallMedal()
     {
-        ShowMedal.CallMedal();
-        ShowMedal.medalObj.GetComponent<Image>().sprite = ShowMedal.spriteMedal;
-        ShowMedal.medalObj.GetComponent<Image>().enabled = true;
+        showMedal.CallMedal();
+        showMedal.medalObj.GetComponent<Image>().sprite = showMedal.spriteMedal;
+        showMedal.medalObj.GetComponent<Image>().enabled = true;
 
-        ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = ShowMedal.quote;
-        ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
+        showMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = showMedal.quote;
+        showMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
 
         StartCoroutine(SetInactive());
     }
@@ -147,8 +162,8 @@ public class CarController_Script : MonoBehaviour
     IEnumerator SetInactive()
     {
         yield return new WaitForSeconds(4f);
-        ShowMedal.medalObj.GetComponent<Image>().enabled = false;
-        ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = false;
+        showMedal.medalObj.GetComponent<Image>().enabled = false;
+        showMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = false;
     }
 
     public void ResetScene()

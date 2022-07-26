@@ -9,6 +9,7 @@ public class Point_Script : MonoBehaviour
     private float startingPoint;
     private float currentPoint;
     [SerializeField] private TextMeshProUGUI pointText;
+    private float points;
 
     public CarController_Script CarControllerScript;
 
@@ -30,17 +31,23 @@ public class Point_Script : MonoBehaviour
             currentPoint = gameObject.transform.position.z;
 
             float distance = Mathf.Abs(startingPoint - currentPoint);
-            if (distance > 15) // reset scene when car move backward too far
+            /*if (distance > 15) // reset scene when car move backward too far
                 CarControllerScript.ResetScene();
-            else if (currentPoint < startingPoint)
+            else*/ if (currentPoint < startingPoint)
             {
                 pointText.text = "Punkte: 00";
                 animUTurn.Play("UTurn");
             }
             else
             {
-                pointText.text = "Punkte: " + distance.ToString("00");
+                pointText.text = "Punkte: " + (distance + points).ToString("00");
             }
         }
+    }
+
+    public void IncreasePoints()
+    {
+        Debug.Log("curr: " + points);
+        points += 5;
     }
 }
