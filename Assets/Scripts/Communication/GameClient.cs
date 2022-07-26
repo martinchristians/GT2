@@ -52,6 +52,7 @@ namespace Communication {
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static async void CreateClient () {
+            ResetButtonsPressed();
             try{
                 socket = new ClientWebSocket();
                 await socket.ConnectAsync(new System.Uri("ws://127.0.0.1:3000/createGame"), CancellationToken.None);
@@ -73,7 +74,6 @@ namespace Communication {
         // TODO track players. if in a level and player leaves with no players left, go back to main menu
 
         static async void RunClient (ClientWebSocket socket) {
-            ResetButtonsPressed();
             while(socket.State == WebSocketState.Open){
                 var bytes = new System.ArraySegment<byte>(new byte[1024]);
                 var result = await socket.ReceiveAsync(bytes, CancellationToken.None);
