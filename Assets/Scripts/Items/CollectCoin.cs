@@ -1,16 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class CollectCoin : MonoBehaviour
-{
-    private AudioSource coinFX;
-    private Point_Script points;
+public class CollectCoin : MonoBehaviour {
 
-    public void Collect()
-    {
-        Debug.Log("called collect");
-        coinFX = GameObject.FindGameObjectWithTag("AudioSource").GetComponent<AudioSource>();
-        coinFX.Play();
+    void Awake () {
+        gameObject.tag = "Coin";
+    }
+
+    public void Collect () {
+        SFX.PlaySound(SFX.Effect.CoinCollected);
+        // TODO increase points in here
+        Destroy(this.gameObject);
     }
 }

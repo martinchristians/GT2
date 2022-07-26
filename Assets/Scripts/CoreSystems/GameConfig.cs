@@ -16,6 +16,7 @@ namespace CoreSystems {
 
         [field: SerializeField] public GameObject carPrefab { get; private set; }   // why is the "vehicle" component not on the top level?!?!?!
         [field: SerializeField] public UI.PauseMenu pauseMenuPrefab { get; private set; }
+        [field: SerializeField] public SFX sfxPrefab { get; private set; }
 
     }
 

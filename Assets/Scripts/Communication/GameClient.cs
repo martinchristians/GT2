@@ -56,6 +56,7 @@ namespace Communication {
             try{
                 socket = new ClientWebSocket();
                 await socket.ConnectAsync(new System.Uri("ws://127.0.0.1:3000/createGame"), CancellationToken.None);
+                // await socket.ConnectAsync(new System.Uri("ws://jwels.berlin:3000/createGame"), CancellationToken.None);
                 switch(socket.State){
                     case WebSocketState.Open:
                         Application.quitting += socket.Abort;
@@ -70,8 +71,6 @@ namespace Communication {
                 Debug.LogException(e);
             }
         }
-
-        // TODO track players. if in a level and player leaves with no players left, go back to main menu
 
         static async void RunClient (ClientWebSocket socket) {
             while(socket.State == WebSocketState.Open){
@@ -157,7 +156,7 @@ namespace Communication {
             }));
         }
 
-        public static async void SendLevelStarted (GamepadLayout layout) {
+        public static void SendLevelStarted (GamepadLayout layout) {
             SendLevelStarted(-1, layout);
         }
 

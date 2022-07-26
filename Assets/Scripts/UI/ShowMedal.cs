@@ -38,10 +38,14 @@ public class ShowMedal : MonoBehaviour
 
     public void CallMedal()
     {
-        // change model of the medal
-        spriteMedal = medalImages[Random.Range(0, medalImages.Count - 1)];
-        
-        // change text on the medal
-        quote = medalQuotes[Random.Range(0, medalQuotes.Count - 1)];
+        try{
+            // change model of the medal
+            spriteMedal = medalImages[Random.Range(0, medalImages.Count - 1)];
+            
+            // change text on the medal
+            quote = medalQuotes[Random.Range(0, medalQuotes.Count - 1)];
+        }catch{
+            Debug.LogWarning("naughty");
+        }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using KenCars;
@@ -22,7 +21,6 @@ public class CarController_Script : MonoBehaviour
     public Animator anim;
 
     private ShowMedal showMedal;
-    private CollectCoin collectCoin;
     public Point_Script points;
 
 
@@ -35,7 +33,6 @@ public class CarController_Script : MonoBehaviour
         anim.Play("FadeIn");
 
         showMedal = new ShowMedal();
-        collectCoin = new CollectCoin();
         points = this.GetComponent<Point_Script>();
     }
 
@@ -123,10 +120,9 @@ public class CarController_Script : MonoBehaviour
             Debug.Log("accelerate");
             VehicleScript.sphere.velocity = Vector3.forward * 25;
         }
-        else if (collision.gameObject.tag == "Coin")
+        else if (collision.gameObject.TryGetComponent<CollectCoin>(out var coin))
         {
-            collision.gameObject.SetActive(false);
-            collectCoin.Collect();
+            coin.Collect();
             points.IncreasePoints();
         }
     }
@@ -149,14 +145,18 @@ public class CarController_Script : MonoBehaviour
 
     void CallMedal()
     {
-        showMedal.CallMedal();
-        showMedal.medalObj.GetComponent<Image>().sprite = showMedal.spriteMedal;
-        showMedal.medalObj.GetComponent<Image>().enabled = true;
+        try{
+            showMedal.CallMedal();
+            showMedal.medalObj.GetComponent<Image>().sprite = showMedal.spriteMedal;
+            showMedal.medalObj.GetComponent<Image>().enabled = true;
 
-        showMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = showMedal.quote;
-        showMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
+            showMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = showMedal.quote;
+            showMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
 
-        StartCoroutine(SetInactive());
+            StartCoroutine(SetInactive());
+        }catch{
+            Debug.LogWarning("naughty");
+        }
     }
 
     IEnumerator SetInactive()

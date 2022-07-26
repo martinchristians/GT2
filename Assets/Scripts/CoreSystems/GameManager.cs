@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Communication;
@@ -27,6 +28,7 @@ namespace CoreSystems {
 
         void Awake () {
             UI.PauseMenu.EnsureExists();
+            SFX.EnsureExists();
             GameClient.onLevelStartRequested += OnLevelRequested;
             GameClient.onMainMenuRequested += OnMainMenuRequested;
             GameClient.onPlayerLeft += OnPlayerLeft;
@@ -77,7 +79,7 @@ namespace CoreSystems {
             }
 
             void OnPauseRequested (PlayerData pausePlayer) {
-                if(!m_loading && isInLevel && !isPaused){
+                if(!m_loading && isInLevel && !isPaused && IsAnActivePlayer(pausePlayer)){
                     Pause(pausePlayer);
                 }
             }
@@ -102,6 +104,11 @@ namespace CoreSystems {
         IEnumerator LoadScene (int sceneIndex) {
             if(m_loading){
                 Debug.LogError($"Already loading, aborting call to load scene \"{sceneIndex}\"!");
+                yield break;
+            }
+            var path = SceneUtility.GetScenePathByBuildIndex(sceneIndex);
+            if(string.IsNullOrWhiteSpace(path)){
+                Debug.LogError($"Invalid scene index \"{sceneIndex}\"!");
                 yield break;
             }
             m_loading = true;
@@ -143,6 +150,15 @@ namespace CoreSystems {
                 GameClient.SendMainMenuOpened();
             }
             m_loading = false;
+        }
+
+        bool IsAnActivePlayer (PlayerData playerToCheck) {
+            foreach(var currentPlayer in m_currentLevelPlayers){
+                if(currentPlayer.id == playerToCheck.id){
+                    return true;
+                }
+            }
+            return false;
         }
 
         void Pause (PlayerData pausePlayer) {
