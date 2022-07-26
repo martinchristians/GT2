@@ -55,6 +55,8 @@ namespace KenCars {
         
         Vector3 containerBase;
         Vector3 initialOffset;
+
+        public bool isGrounded => onGround;
         
         // Functions
         
