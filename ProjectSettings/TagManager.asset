@@ -8,6 +8,7 @@ TagManager:
   - BigSmall
   - Cone
   - TheEnd
+  - Ground
   layers:
   - Default
   - TransparentFX

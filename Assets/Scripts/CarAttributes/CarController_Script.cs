@@ -7,12 +7,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class CarController_Script: MonoBehaviour
+public class CarController_Script : MonoBehaviour
 {
     public int maxHealth = 3;
     public int currentHealth;
     private int shieldNumber = 2;
-    
+
     public HealthBar_Script HealthBarScript;
     public GameObject shields;
     [SerializeField] private bool shields_b;
@@ -21,7 +21,7 @@ public class CarController_Script: MonoBehaviour
     public Animator anim;
 
     public ShowMedal ShowMedal;
-    
+
     private void Start()
     {
         currentHealth = maxHealth;
@@ -33,7 +33,7 @@ public class CarController_Script: MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name != "Ground")
+        if (collision.gameObject.tag != "Ground")
         {
             Debug.Log("COLLIDE");
             if (collision.gameObject.tag == "TheEnd")
@@ -62,7 +62,7 @@ public class CarController_Script: MonoBehaviour
                 else
                 {
                     CallMedal();
-                    
+
                     if (collision.gameObject.tag == "Damage")
                     {
                         Debug.Log("Collide normally");
@@ -89,17 +89,18 @@ public class CarController_Script: MonoBehaviour
         if (collision.gameObject.name == "Shield")
         {
             Debug.Log("shield active");
-            
+
             shields_b = true;
             for (int i = 0; i < 3; i++)
             {
                 shields.transform.GetChild(i).gameObject.GetComponent<Image>().enabled = true;
             }
             Destroy(collision.gameObject);
-        } else if (collision.gameObject.name == "Health")
+        }
+        else if (collision.gameObject.name == "Health")
         {
             Debug.Log("collide health");
-            
+
             if (currentHealth < 3)
             {
                 Debug.Log("add one life");
@@ -107,7 +108,8 @@ public class CarController_Script: MonoBehaviour
                 currentHealth += 1;
                 Destroy(collision.gameObject);
             }
-        } else if (collision.gameObject.name == "SpeedPad")
+        }
+        else if (collision.gameObject.name == "SpeedPad")
         {
             Debug.Log("accelerate");
             VehicleScript.sphere.velocity = Vector3.forward * 25;
@@ -135,10 +137,10 @@ public class CarController_Script: MonoBehaviour
         ShowMedal.CallMedal();
         ShowMedal.medalObj.GetComponent<Image>().sprite = ShowMedal.spriteMedal;
         ShowMedal.medalObj.GetComponent<Image>().enabled = true;
-                    
+
         ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = ShowMedal.quote;
         ShowMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
-        
+
         StartCoroutine(SetInactive());
     }
 
