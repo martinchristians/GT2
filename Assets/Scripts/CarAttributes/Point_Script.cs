@@ -28,13 +28,17 @@ public class Point_Script : MonoBehaviour
         else
         {
             currentPoint = gameObject.transform.position.z;
-            if (currentPoint < 0)
+
+            float distance = Mathf.Abs(startingPoint - currentPoint);
+            if (currentPoint < startingPoint)
             {
                 pointText.text = "Punkte: 00";
                 animUTurn.Play("UTurn");
             }
             else
-                pointText.text = "Punkte: " + currentPoint.ToString("00");
+            {
+                pointText.text = "Punkte: " + distance.ToString("00");
+            }
         }
     }
 }
