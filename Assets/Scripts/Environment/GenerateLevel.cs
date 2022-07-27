@@ -32,7 +32,8 @@ public class GenerateLevel : MonoBehaviour
             creatingSection = true;
             GenerateSection();
         }
-        current_car_zPos = GameObject.Find("vehicleCar(Clone)/vehicle").transform.localPosition.z;
+        // current_car_zPos = GameObject.Find("vehicleCar(Clone)/vehicle").transform.localPosition.z;
+        current_car_zPos = CarController.current.position.z;
         // increment distance if car has moved forward
         if (current_car_zPos >= next_car_zPos)
         {

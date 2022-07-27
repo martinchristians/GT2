@@ -35,6 +35,8 @@ namespace CoreSystems {
 
         bool m_loading = false;
         int m_nextScene = -1;
+        bool m_currentlyGameOver = false;
+        Coroutine m_gameOverSequence = null;
 
         static List<PlayerData> m_currentLevelPlayers = new List<PlayerData>();
         static List<PlayerData> m_currentLevelSpectators = new List<PlayerData>();
@@ -49,7 +51,7 @@ namespace CoreSystems {
         public static IReadOnlyList<PlayerData> spectators => m_currentLevelSpectators;
 
         void Awake () {
-            // SaveFile.ReadFromDisk();
+            SaveFile.ReadFromDisk();
             UI.Ingame.GameUI.EnsureExists();
             UI.PauseMenu.EnsureExists();
             SFX.EnsureExists();
@@ -110,13 +112,18 @@ namespace CoreSystems {
             }
 
             void OnPauseRequested (PlayerData pausePlayer) {
-                if(!m_loading && isInLevel && !isPaused && IsAnActivePlayer(pausePlayer)){
+                if(!m_loading && isInLevel && !isPaused && IsAnActivePlayer(pausePlayer) && !m_currentlyGameOver){
                     Pause(pausePlayer);
                 }
             }
 
             void OnUnPauseRequested (PlayerData unpausePlayer) {
-                if(isPaused && pausedByPlayerData.Equals(unpausePlayer)){
+                if(m_loading || !isInLevel){
+                    return;
+                }
+                if(m_currentlyGameOver){
+                    m_nextScene = SceneManager.GetActiveScene().buildIndex;
+                }else if(isPaused && pausedByPlayerData.Equals(unpausePlayer)){
                     Unpause();
                 }
             }
@@ -141,6 +148,10 @@ namespace CoreSystems {
             if(string.IsNullOrWhiteSpace(path)){
                 Debug.LogError($"Invalid scene index \"{sceneIndex}\"!");
                 yield break;
+            }
+            if(m_gameOverSequence != null){
+                StopCoroutine(m_gameOverSequence);
+                m_gameOverSequence = null;
             }
             m_loading = true;
             yield return SceneManager.LoadSceneAsync(sceneIndex);
@@ -173,6 +184,7 @@ namespace CoreSystems {
         }
 
         void SpawnCarAndResume () {
+            m_currentlyGameOver = false;
             var spawn = CarSpawn.current;
             if(spawn == null){
                 Debug.LogWarning("Car spawn instance not set, looking via GameObject.FindObjectOfType.");
@@ -231,16 +243,34 @@ namespace CoreSystems {
             Time.timeScale = 1f;
         }
 
+        // TODO also have a successful end
+        // player death should be ignored after that
+        // input should still be off and the handing the same
+        // the whole game over sequence should be the same tbh
+        // with the camera stuck and all that
+        // just with more health
+        // save data probably needs a "success" field
+        // so that you can't fail the timed challenge but have a better score because you failed faster
+
         void OnPlayerDeath () {
-            Debug.Log("TODO game over");
-            // show the game over screen
-            // tell the clients that the game is over
-            // options (return to menu, retry)
+            m_currentlyGameOver = true;
+            m_gameOverSequence = StartCoroutine(GameOverSequence());
             if(Level.current != null){
-                var levelSaveData = Level.current.GetSaveData();
-                SaveFile.SetLevelSaveData(levelSaveData);
-                SaveFile.IncreaseCoinCounter(levelSaveData.coinsCollected);
-                SaveFile.IncreaseTotalPlayTime(levelSaveData.playDuration);
+                var newSaveData = Level.current.GetSaveData();
+                if(!SaveFile.TryGetLevelSaveData(newSaveData.levelName, out var existingSaveData) || newSaveData.IsBetterThan(existingSaveData)){
+                    SaveFile.SetLevelSaveData(newSaveData);
+                }
+                SaveFile.IncreaseCoinCounter(newSaveData.coinsCollected);
+                SaveFile.IncreaseTotalPlayTime(newSaveData.playDuration);
+            }
+        }
+
+        IEnumerator GameOverSequence () {
+            yield return new WaitForSeconds(2);
+            // show game over screen in ui
+            if(GameClient.connected){
+                yield return new WaitForSeconds(2);
+                GameClient.UpdatePauseState(players[0].id, true);
             }
         }
 

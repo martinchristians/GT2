@@ -70,15 +70,15 @@ namespace CoreSystems {
         }
         
         [SerializeField] int m_totalCoinsCollected;
-        [SerializeField] System.TimeSpan m_totalPlayTime;
+        [SerializeField] float m_totalPlayTime;
         [SerializeField] List<Level.SaveData> m_levelSaveDatas; 
 
         public static void IncreaseCoinCounter (int coins) {
             instance.m_totalCoinsCollected += Mathf.Max(0, coins);
         }
 
-        public static void IncreaseTotalPlayTime (System.TimeSpan timeSpan) {
-            instance.m_totalPlayTime += timeSpan;
+        public static void IncreaseTotalPlayTime (float duration) {
+            instance.m_totalPlayTime += duration;
         }
 
         public static void SetLevelSaveData (Level.SaveData levelData) {
@@ -93,7 +93,7 @@ namespace CoreSystems {
 
         public static int GetTotalCoinsCollected () => instance.m_totalCoinsCollected;
 
-        public static System.TimeSpan GetTotalPlayTime () => instance.m_totalPlayTime;
+        public static System.TimeSpan GetTotalPlayTime () => System.TimeSpan.FromSeconds(instance.m_totalPlayTime);
 
         public static bool TryGetLevelSaveData (string levelName, out Level.SaveData output) {
             if(instance.m_levelSaveDatas != null){

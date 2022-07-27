@@ -64,11 +64,6 @@ public class CarController : MonoBehaviour {
     }
 
     void FixedUpdate () {
-        if(Level.current != null){
-            if(position.y < Level.current.killPlaneY){
-                TakeDamage(MAX_HEALTH);
-            }
-        }
         var currentVelocity = m_actualBody.velocity;
         if(m_collidedWithSomething){
             var deltaV = Vector3.ProjectOnPlane(currentVelocity - m_lastVelocity, Vector3.up);
@@ -103,6 +98,7 @@ public class CarController : MonoBehaviour {
 
     void OnCollisionEnter (Collision collision) {
         if(isDead || collision.gameObject.tag == "Ground") return;
+        m_collidedWithSomething = true;
         if(collision.gameObject.TryGetComponent<Environment.Obstacle>(out var obstacle)){
             m_hitObstacles.Add(obstacle);
             m_collidedWithSomethingDamaging |= obstacle.dealsDamage;
@@ -156,6 +152,10 @@ public class CarController : MonoBehaviour {
             return true;
         }
         return false;
+    }
+
+    public void Kill () {
+        TakeDamage(currentHealth);
     }
 
     void TakeDamage (int damage) {
