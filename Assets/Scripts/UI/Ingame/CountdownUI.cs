@@ -11,12 +11,18 @@ namespace UI.Ingame {
 
         private Coroutine m_current;
 
+        public void Initialize () {
+            this.gameObject.SetActive(false);
+        }
+
         public void DoCountdown (System.Action onFinished) {
-            if(m_current != null) StopCoroutine(m_current);
+            if(m_current != null){
+                StopCoroutine(m_current);
+            }
+            this.gameObject.SetActive(true);
             m_current = StartCoroutine(ExecuteCountdown());
 
             IEnumerator ExecuteCountdown () {
-                this.gameObject.SetActive(true);
                 m_canvasGroup.enabled = true;
                 m_canvasGroup.alpha = 1;
                 var t = 3f;

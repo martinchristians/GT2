@@ -22,6 +22,7 @@ namespace CoreSystems {
                 return null;
             }
             var spawnedGO = Instantiate(GameConfig.instance.carPrefab, this.transform.position, this.transform.rotation);
+            spawnedGO.name = "[Player Car Parent]";
             m_carSpawned = true;
             return spawnedGO.GetComponentInChildren<CarController>();
         }

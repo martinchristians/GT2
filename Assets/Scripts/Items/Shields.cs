@@ -3,7 +3,7 @@ namespace Items {
     public class Shields : PickupItem {
         
         protected override void OnCarTriggerEnter (CarController otherCar) {
-            if(otherCar.TryGetShields()){
+            if(otherCar.TryGainShields()){
                 Destroy(this.gameObject);
             }
         }

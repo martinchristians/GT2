@@ -8,6 +8,24 @@ namespace CoreSystems {
 
     public class GameManager : MonoBehaviour {
 
+#if UNITY_EDITOR
+
+        const string START_WITH_COUNTDOWN_KEY = "startWithCountdown";
+
+        [UnityEditor.MenuItem("Custom/Countdown/Enable")]
+        static void EnableCountdown () => UnityEditor.EditorPrefs.SetBool(START_WITH_COUNTDOWN_KEY, true);
+
+        [UnityEditor.MenuItem("Custom/Countdown/Enable", true)]
+        static bool EnableCountdownEnabled () => !UnityEditor.EditorPrefs.GetBool(START_WITH_COUNTDOWN_KEY, true);
+
+        [UnityEditor.MenuItem("Custom/Countdown/Disable")]
+        static void DisableCountdown () => UnityEditor.EditorPrefs.SetBool(START_WITH_COUNTDOWN_KEY, false);
+
+        [UnityEditor.MenuItem("Custom/Countdown/Disable", true)]
+        static bool DisableCountdownEnabled () => UnityEditor.EditorPrefs.GetBool(START_WITH_COUNTDOWN_KEY, true);
+
+#endif
+
         const int MAIN_MENU_SCENE_INDEX = 0;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -43,6 +61,7 @@ namespace CoreSystems {
             GameClient.onUnpauseRequested += OnUnPauseRequested;
             UI.Ingame.GameUI.instance.visible = isInLevel;
             if(isInLevel){
+                UI.Ingame.GameUI.instance.OnNewLevel();
                 SpawnCarAndResume();
             }
 
@@ -145,6 +164,7 @@ namespace CoreSystems {
                 }else{
                     m_nextScene = MAIN_MENU_SCENE_INDEX;
                 }
+                UI.Ingame.GameUI.instance.OnNewLevel();
                 SpawnCarAndResume();
             }else{
                 GameClient.SendMainMenuOpened();
@@ -169,6 +189,14 @@ namespace CoreSystems {
             if(GameClient.connected){
                 Unpause();
             }
+#if UNITY_EDITOR
+            if(!UnityEditor.EditorPrefs.GetBool(START_WITH_COUNTDOWN_KEY, true)){
+                if(Level.current != null){
+                    Level.current.StartTimer();
+                }
+                return;
+            }
+#endif
             car.inputBlocked = true;
             UI.Ingame.GameUI.instance.countdown.DoCountdown(() => {
                 car.inputBlocked = false;

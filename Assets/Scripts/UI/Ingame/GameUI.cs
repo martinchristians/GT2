@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace UI.Ingame {
@@ -21,6 +19,10 @@ namespace UI.Ingame {
             if(instance == null){
                 DontDestroyOnLoad(Instantiate(CoreSystems.GameConfig.instance.gameUiPrefab));
             }
+        }
+
+        public void OnNewLevel () {
+            countdown.Initialize();
         }
         
         void Awake () {
