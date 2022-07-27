@@ -18,15 +18,23 @@ public class Level : MonoBehaviour {
     [SerializeField] float m_silverTime;
     [SerializeField] float m_bronzeTime;
     [SerializeField] float m_initTimeLimit;
+    [SerializeField] float m_maxTimeGain;
+    [SerializeField] float m_minTimeGain;
+    [SerializeField] int m_stepsFromMaxToMinTimeGain;
     [SerializeField] float m_goldDist;
     [SerializeField] float m_silverDist;
     [SerializeField] float m_bronzeDist;
 
     float m_startTime;
     int m_currentCoinsCollected;
+    int m_checkpointsPassed;
+
+    public event System.Action onCoinCollected = delegate {};
+    public event System.Action onCheckpointPassed = delegate {};
 
     public float playTime => Time.time - m_startTime;
     public float remainingTime { get; private set; }
+    public int currentCoinsCollected => m_currentCoinsCollected;
 
     public float displayTime { get {
         switch(m_mode){
@@ -64,10 +72,37 @@ public class Level : MonoBehaviour {
 
     public void CoinCollected () {
         m_currentCoinsCollected++;
+        onCoinCollected();
+    }
+
+    public void CheckpointPassed () {
+        var timeGain = Mathf.Lerp(m_maxTimeGain, m_minTimeGain, Mathf.Clamp01((float)m_checkpointsPassed / m_stepsFromMaxToMinTimeGain));
+        remainingTime += timeGain;
+        m_checkpointsPassed++;
+        onCheckpointPassed();
     }
 
     public void StartTimer () {
         m_startTime = Time.time;
+    }
+
+    public string GetInfoAsString () {
+        switch(m_mode){
+            case Mode.FreePlay:
+                return "Free Play!";
+            case Mode.GoFarWithCheckpoints:
+                return
+                    $"Gold: {m_goldDist:F0}m\n"+
+                    $"Silver: {m_silverDist:F0}m\n"+
+                    $"Bronze: {m_bronzeDist:F0}m";
+            case Mode.GoFastWithTimeLimits:
+                return
+                    $"Gold: {m_goldTime:F1}s\n"+
+                    $"Silver: {m_silverTime:F1}sW\n"+
+                    $"Bronze: {m_bronzeTime:F1}s";
+            default:
+                return "???";
+        }
     }
 
     public SaveData GetSaveData () {

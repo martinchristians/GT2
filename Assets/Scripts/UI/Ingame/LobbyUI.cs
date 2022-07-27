@@ -1,18 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 
 namespace UI.Ingame {
 
-    public class LobbyUI : MonoBehaviour {
-
-        [SerializeField] TextMeshProUGUI m_text;
+    public class LobbyUI : BoxWithTextUI {
 
         System.Text.StringBuilder m_sb;
-
-        RectTransform rectTransform => (RectTransform)transform;
         
         void Start () {
             m_sb = new System.Text.StringBuilder();
@@ -51,12 +43,7 @@ namespace UI.Ingame {
         }
 
         void ApplyStringbuilderText () {
-            m_text.text = m_sb.ToString().Trim();
-            m_text.ForceMeshUpdate(true);
-            rectTransform.SetSizeWithCurrentAnchors(
-                axis: RectTransform.Axis.Vertical,
-                size: m_text.preferredHeight - m_text.rectTransform.sizeDelta.y
-            );
+            ApplyText(m_sb.ToString());
         }
 
     }

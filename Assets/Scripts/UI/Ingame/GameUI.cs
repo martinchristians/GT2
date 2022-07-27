@@ -10,6 +10,7 @@ namespace UI.Ingame {
 
         [field: SerializeField] public CountdownUI countdown;
         [field: SerializeField] public TimerUI timer;
+        [field: SerializeField] public LevelInfoUI levelInfo;
 
         public bool visible {
             get => m_canvas.enabled;
@@ -25,6 +26,7 @@ namespace UI.Ingame {
         public void OnNewLevel () {
             countdown.Initialize();
             timer.Initialize();
+            levelInfo.Initialize();
         }
         
         void Awake () {

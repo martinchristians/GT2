@@ -16,8 +16,10 @@ namespace UI.Ingame {
 
         void Update () {
             var minutes = Mathf.FloorToInt(m_level.displayTime) / 60;
-            var seconds = m_level.displayTime - (60 * minutes);
-            m_text.text = $"{minutes}:{seconds:F2}";
+            var secondsRaw = m_level.displayTime - (60 * minutes);
+            var secondsInt = Mathf.FloorToInt(secondsRaw);
+            var secondsRemainder = Mathf.Repeat(secondsRaw, 1);
+            m_text.text = $"{minutes:D2}:{secondsInt:D2}.{secondsRemainder.ToString("F2").Substring(2)}";
         }
 
     }

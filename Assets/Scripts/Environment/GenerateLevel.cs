@@ -1,62 +1,53 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GenerateLevel : MonoBehaviour
-{
-    public GameObject[] sections;
-    static Queue<GameObject> sectionQueue;
-    public int zPos = 50;
+public class GenerateLevel : MonoBehaviour {
 
-    public bool creatingSection = false;
-    public int distance;
-    public bool addingDis = false;
-    float current_car_zPos;
-    static float next_car_zPos;
+    const float SECTION_LENGTH = 50;
+    const int GENERATED_SECTION_BUFFER_SIZE = 10;
 
-    void Start()
-    {
-        if (current_car_zPos == null)
-        {
-            current_car_zPos = GameObject.Find("vehicleCar(Clone)/vehicle").transform.localPosition.z;
+    [SerializeField] GameObject[] m_groundVariations;
+    [SerializeField] GameObject[] m_roadVariations;
+
+    Queue<GameObject> spawnedSections;
+
+    float nextSectionZ;
+
+    void Start () {
+        foreach(var obj in m_groundVariations) obj.SetActive(false);
+        foreach(var obj in m_roadVariations) obj.SetActive(false);
+        spawnedSections = new Queue<GameObject>();
+        nextSectionZ = SECTION_LENGTH;
+        for(int i=0; i<GENERATED_SECTION_BUFFER_SIZE / 2; i++){
+            spawnedSections.Enqueue(GenerateSection());
         }
-        next_car_zPos = current_car_zPos + 1;
-        sectionQueue = new Queue<GameObject>();
+        Level.current.onCheckpointPassed += () => {
+            spawnedSections.Enqueue(GenerateSection());
+            while(spawnedSections.Count > GENERATED_SECTION_BUFFER_SIZE){
+                Destroy(spawnedSections.Dequeue());
+            }
+        };
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (!creatingSection)
-        {
-            creatingSection = true;
-            GenerateSection();
-        }
-        // current_car_zPos = GameObject.Find("vehicleCar(Clone)/vehicle").transform.localPosition.z;
-        current_car_zPos = CarController.current.position.z;
-        // increment distance if car has moved forward
-        if (current_car_zPos >= next_car_zPos)
-        {
-            next_car_zPos = current_car_zPos + 25;
-            distance += 25;
-            creatingSection = false;
-            // debug distance
-            Debug.Log($"distance: {distance}");
-        }
-        if (sectionQueue.Count >= 50)
-        {
-            GameObject section = sectionQueue.Dequeue();
-            Destroy(section);
-        }
+    GameObject GenerateSection () {
+        var ground = Instantiate(m_groundVariations[Random.Range(0, m_groundVariations.Length)]);
+        ground.SetActive(true);
+        if(Random.value > 0.5f) MirrorX(ground.transform.Find("Buildings"));
+        var road = Instantiate(m_roadVariations[Random.Range(0, m_roadVariations.Length)]);
+        road.SetActive(true);
+        road.transform.SetParent(ground.transform, false);
+        road.transform.localPosition = Vector3.zero;
+        ground.transform.position = new Vector3(0, 0, nextSectionZ);
+        nextSectionZ += SECTION_LENGTH;
+        return ground;
     }
 
-    public void GenerateSection()
-    {
-        int random = Random.Range(0, sections.Length);
-        GameObject section = sections[random];
-        sectionQueue.Enqueue(Instantiate(section, new Vector3(0, 0, zPos), Quaternion.identity));
-        zPos += 50;
-        //yield return new WaitForSeconds(2);
-        //creatingSection = false;
+    static void MirrorX (Transform transform) {
+        transform.localScale = Vector3.Scale(transform.localScale, new Vector3(-1, 1, 1));
     }
+
+    static void MirrorZ (Transform transform) {
+        transform.localScale = Vector3.Scale(transform.localScale, new Vector3(1, 1, -1));
+    }
+
 }

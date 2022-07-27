@@ -79,7 +79,7 @@ Material:
     m_Ints: []
     m_Floats:
     - Boolean_9F4422B3: 0
-    - FogDensity: 0.5
+    - FogDensity: 0.05
     - FogNoise: 10
     - FogSpeed: 0.1
     - Vector1_4464715: 5

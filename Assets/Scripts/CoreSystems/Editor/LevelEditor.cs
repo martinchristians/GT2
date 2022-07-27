@@ -10,6 +10,9 @@ public class LevelEditor : GenericEditor {
             case "m_bronzeTime":
                 return serializedObject.FindProperty("m_mode").intValue != (int)(Level.Mode.GoFastWithTimeLimits);
             case "m_initTimeLimit":
+            case "m_maxTimeGain":
+            case "m_minTimeGain":
+            case "m_stepsFromMaxToMinTimeGain":
             case "m_goldDist":
             case "m_silverDist":
             case "m_bronzeDist":
