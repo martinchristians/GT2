@@ -28,6 +28,7 @@ public class Level : MonoBehaviour {
     float m_startTime;
     int m_currentCoinsCollected;
     int m_checkpointsPassed;
+    float m_initZ;
 
     public event System.Action onCoinCollected = delegate {};
     public event System.Action onCheckpointPassed = delegate {};
@@ -35,6 +36,8 @@ public class Level : MonoBehaviour {
     public float playTime => Time.time - m_startTime;
     public float remainingTime { get; private set; }
     public int currentCoinsCollected => m_currentCoinsCollected;
+    public float distanceTraveled => (m_mode != Mode.GoFarWithCheckpoints ? float.NaN : Mathf.Max(0, CarController.current.position.z - m_initZ));
+    public Mode mode => m_mode;
 
     public float displayTime { get {
         switch(m_mode){
@@ -51,6 +54,12 @@ public class Level : MonoBehaviour {
         current = this;
         m_startTime = float.NaN;
         remainingTime = m_initTimeLimit;
+    }
+
+    void Start () {
+        if(m_mode == Mode.GoFarWithCheckpoints && CoreSystems.CarSpawn.current != null){
+            m_initZ = CoreSystems.CarSpawn.current.transform.position.z;
+        }
     }
 
     void Update () {
@@ -110,7 +119,7 @@ public class Level : MonoBehaviour {
             levelName = this.gameObject.scene.name,
             levelMode = this.m_mode,
             playDuration = playTime,
-            distanceCovered = float.NaN,    // TODO
+            distanceCovered = distanceTraveled,
             coinsCollected = m_currentCoinsCollected,
             starRating = CalculateRating()
         };

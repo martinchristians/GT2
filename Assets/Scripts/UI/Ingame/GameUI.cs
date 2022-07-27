@@ -10,6 +10,7 @@ namespace UI.Ingame {
 
         [field: SerializeField] public CountdownUI countdown;
         [field: SerializeField] public TimerUI timer;
+        [field: SerializeField] public DistanceUI distance;
         [field: SerializeField] public LevelInfoUI levelInfo;
 
         public bool visible {
@@ -26,6 +27,7 @@ namespace UI.Ingame {
         public void OnNewLevel () {
             countdown.Initialize();
             timer.Initialize();
+            distance.Initialize();
             levelInfo.Initialize();
         }
         
