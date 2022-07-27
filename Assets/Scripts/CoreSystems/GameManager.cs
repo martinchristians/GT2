@@ -54,6 +54,7 @@ namespace CoreSystems {
             SaveFile.ReadFromDisk();
             UI.Ingame.GameUI.EnsureExists();
             UI.PauseMenu.EnsureExists();
+            UI.GameOver.GameOverUI.EnsureExists();
             SFX.EnsureExists();
             GameClient.onLevelStartRequested += OnLevelRequested;
             GameClient.onMainMenuRequested += OnMainMenuRequested;
@@ -61,6 +62,7 @@ namespace CoreSystems {
             GameClient.onPlayerJoined += OnPlayerJoined;
             GameClient.onPauseRequested += OnPauseRequested;
             GameClient.onUnpauseRequested += OnUnPauseRequested;
+            UI.GameOver.GameOverUI.Hide();
             UI.Ingame.GameUI.instance.visible = isInLevel;
             if(isInLevel){
                 UI.Ingame.GameUI.instance.OnNewLevel();
@@ -155,6 +157,7 @@ namespace CoreSystems {
             }
             m_loading = true;
             yield return SceneManager.LoadSceneAsync(sceneIndex);
+            UI.GameOver.GameOverUI.Hide();
             if(sceneIndex > MAIN_MENU_SCENE_INDEX){
                 GameClient.ResetButtonsPressed();
                 GameClient.SendLevelStarted(currentLayout);
@@ -175,9 +178,11 @@ namespace CoreSystems {
                 }else{
                     m_nextScene = MAIN_MENU_SCENE_INDEX;
                 }
+                UI.Ingame.GameUI.instance.visible = true;
                 UI.Ingame.GameUI.instance.OnNewLevel();
                 SpawnCarAndResume();
             }else{
+                UI.Ingame.GameUI.instance.visible = false;
                 GameClient.SendMainMenuOpened();
             }
             m_loading = false;
@@ -254,22 +259,26 @@ namespace CoreSystems {
 
         void OnPlayerDeath () {
             m_currentlyGameOver = true;
-            m_gameOverSequence = StartCoroutine(GameOverSequence());
             if(Level.current != null){
                 var newSaveData = Level.current.GetSaveData();
+                m_gameOverSequence = StartCoroutine(GameOverSequence(newSaveData));
                 if(!SaveFile.TryGetLevelSaveData(newSaveData.levelName, out var existingSaveData) || newSaveData.IsBetterThan(existingSaveData)){
                     SaveFile.SetLevelSaveData(newSaveData);
                 }
                 SaveFile.IncreaseCoinCounter(newSaveData.coinsCollected);
                 SaveFile.IncreaseTotalPlayTime(newSaveData.playDuration);
+                SaveFile.WriteToDisk();
+            }else{
+                m_gameOverSequence = StartCoroutine(GameOverSequence(default));
             }
         }
 
-        IEnumerator GameOverSequence () {
-            yield return new WaitForSeconds(2);
-            // show game over screen in ui
+        IEnumerator GameOverSequence (Level.SaveData levelSaveData) {
+            yield return new WaitForSecondsRealtime(2);
+            UI.GameOver.GameOverUI.Show(levelSaveData);
+            Time.timeScale = 0f;
             if(GameClient.connected){
-                yield return new WaitForSeconds(2);
+                yield return new WaitForSecondsRealtime(2);
                 GameClient.UpdatePauseState(players[0].id, true);
             }
         }

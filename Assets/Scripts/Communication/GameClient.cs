@@ -53,6 +53,12 @@ namespace Communication {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static async void CreateClient () {
             ResetButtonsPressed();
+#if UNITY_EDITOR
+            onRoomCodeGenerated += (rc) => {
+                UnityEditor.EditorGUIUtility.systemCopyBuffer = rc;
+                UnityEngine.Debug.Log($"Room code \"{rc}\" written to copy-buffer");
+            };
+#endif
             try{
                 socket = new ClientWebSocket();
                 await socket.ConnectAsync(new System.Uri("ws://127.0.0.1:3000/createGame"), CancellationToken.None);

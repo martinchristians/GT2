@@ -14,8 +14,8 @@ namespace UI.Ingame {
         [field: SerializeField] public LevelInfoUI levelInfo;
 
         public bool visible {
-            get => m_canvas.enabled;
-            set => m_canvas.enabled = value;
+            get => gameObject.activeSelf;
+            set => gameObject.SetActive(value);
         }
 
         public static void EnsureExists () {

@@ -16,3 +16,4 @@ MonoBehaviour:
   <pauseMenuPrefab>k__BackingField: {fileID: 2843736368542121937, guid: ab609c2ce92a01a4a8c1ea05a36501a4, type: 3}
   <gameUiPrefab>k__BackingField: {fileID: 7780307725920383376, guid: dbd99c9b2e4069c4eb1ac0b2cfc163e4, type: 3}
   <sfxPrefab>k__BackingField: {fileID: 6970405200070296298, guid: beaae8cac11b20d4899f221c7a206977, type: 3}
+  <gameOverUiPrefab>k__BackingField: {fileID: 4123246917850287560, guid: bd8f01df9a96bb64e80f36978fb93938, type: 3}

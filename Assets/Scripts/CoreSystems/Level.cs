@@ -129,7 +129,10 @@ public class Level : MonoBehaviour {
                 case Mode.FreePlay:
                     return 0;
                 case Mode.GoFarWithCheckpoints:
-                    // TODO
+                    if(distanceTraveled >= m_goldDist) return 3;
+                    if(distanceTraveled >= m_silverDist) return 2;
+                    if(distanceTraveled >= m_bronzeDist) return 1;
+                    return 0;
                 case Mode.GoFastWithTimeLimits:
                     if(playTime <= m_goldTime) return 3;
                     if(playTime <= m_silverTime) return 2;

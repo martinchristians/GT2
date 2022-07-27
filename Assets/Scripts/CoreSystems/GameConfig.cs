@@ -18,6 +18,7 @@ namespace CoreSystems {
         [field: SerializeField] public UI.PauseMenu pauseMenuPrefab { get; private set; }
         [field: SerializeField] public UI.Ingame.GameUI gameUiPrefab { get; private set; }
         [field: SerializeField] public SFX sfxPrefab { get; private set; }
+        [field: SerializeField] public UI.GameOver.GameOverUI gameOverUiPrefab { get; private set; }
 
     }
 
