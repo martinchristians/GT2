@@ -18,6 +18,7 @@ namespace KenCars {
         [Range(1, 20)] public float followSpeed	= 16;
         [Range(1, 20)] public float rotationSpeed = 12;
         
+        public bool followPosition = true;
         public bool followRotation = true;
         
         // Private
@@ -50,8 +51,12 @@ namespace KenCars {
             
             // Camera follow
             
-            rig.position = Vector3.Lerp(rig.position, transform.position + cameraPositionOffset, Time.deltaTime * followSpeed);
-            if(followRotation){ rig.rotation = Quaternion.Lerp(rig.rotation, Quaternion.Euler(transform.eulerAngles + cameraRotationOffset), Time.deltaTime * rotationSpeed); }
+            if(followPosition){
+                rig.position = Vector3.Lerp(rig.position, transform.position + cameraPositionOffset, Time.deltaTime * followSpeed);
+            }
+            if(followRotation){
+                rig.rotation = Quaternion.Lerp(rig.rotation, Quaternion.Euler(transform.eulerAngles + cameraRotationOffset), Time.deltaTime * rotationSpeed);
+            }
             
         }
         

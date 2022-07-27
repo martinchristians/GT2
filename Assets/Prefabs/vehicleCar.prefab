@@ -366,6 +366,7 @@ MonoBehaviour:
   m_healthBar: {fileID: 2367951642514557641}
   m_shieldsDisplay: {fileID: 1182764140110926731}
   m_vehicle: {fileID: 2365087100224260640}
+  m_camController: {fileID: 2365087100224260655}
 --- !u!1 &2365087099082276720
 GameObject:
   m_ObjectHideFlags: 0
@@ -5572,6 +5573,7 @@ MonoBehaviour:
   rig: {fileID: 2365087100540023481}
   followSpeed: 8
   rotationSpeed: 4
+  followPosition: 1
   followRotation: 1
 --- !u!135 &2365087100224260654
 SphereCollider:

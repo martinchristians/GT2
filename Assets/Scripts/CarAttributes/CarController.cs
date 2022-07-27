@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour {
 
+    public static CarController current { get; private set; }
+
     private const int MAX_HEALTH = 3;
     private const float BOOST_SPEED = 25;
 
@@ -11,6 +13,7 @@ public class CarController : MonoBehaviour {
     [SerializeField] HealthBar m_healthBar;
     [SerializeField] ShieldsDisplay m_shieldsDisplay;
     [SerializeField] Vehicle m_vehicle;
+    [SerializeField] VehicleCamera m_camController;
 
     public int maxHealth => MAX_HEALTH;
     public int currentHealth { get; private set; }
@@ -28,12 +31,29 @@ public class CarController : MonoBehaviour {
     public Vector3 position => m_actualBody.position;
     public bool isGrounded => m_vehicle.isGrounded;
 
+    public bool inputBlocked {
+        get => !m_vehicle.controllable;
+        set => m_vehicle.controllable = !value;
+    }
+
+    void Awake () {
+        current = this;
+    }
+
     void Start () {
         currentHealth = MAX_HEALTH;
         currentArmor = 0;
 
         m_healthBar.Initialize(this);
         m_shieldsDisplay.Initialize(this);
+    }
+
+    void FixedUpdate () {
+        if(Level.current != null){
+            if(position.y < Level.current.killPlaneY){
+                TakeDamage(MAX_HEALTH);
+            }
+        }
     }
 
     void OnCollisionEnter (Collision collision) {
@@ -91,10 +111,13 @@ public class CarController : MonoBehaviour {
     }
 
     void TakeDamage (int damage) {
+        if(isDead) return;
         currentHealth -= damage;
         onDamaged();
         if(isDead){
-            Debug.Log("TODO game over");    // TODO does this call something or does the gamemanager get a call?
+            onDied();
+            m_vehicle.controllable = false;
+            m_camController.followPosition = false;
         }
     }
 

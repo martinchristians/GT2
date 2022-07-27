@@ -17,15 +17,22 @@ namespace CoreSystems {
 
         bool m_loading = false;
         int m_nextScene = -1;
-        List<PlayerData> m_currentLevelPlayers = new List<PlayerData>();
 
-        bool isInLevel => SceneManager.GetActiveScene().buildIndex > 0;
-        GamepadLayout currentLayout => (SceneManager.GetActiveScene().buildIndex == 3) ? GamepadLayout.jump : GamepadLayout.standard;
+        static List<PlayerData> m_currentLevelPlayers = new List<PlayerData>();
+        static List<PlayerData> m_currentLevelSpectators = new List<PlayerData>();
+
+        static bool isInLevel => SceneManager.GetActiveScene().buildIndex != 0;
+        static GamepadLayout currentLayout => (SceneManager.GetActiveScene().buildIndex == 3) ? GamepadLayout.jump : GamepadLayout.standard;
 
         public static bool isPaused { get; private set; }
         public static PlayerData pausedByPlayerData { get; private set; }
 
+        public static IReadOnlyList<PlayerData> players => m_currentLevelPlayers;
+        public static IReadOnlyList<PlayerData> spectators => m_currentLevelSpectators;
+
         void Awake () {
+            // SaveFile.ReadFromDisk();
+            UI.Ingame.GameUI.EnsureExists();
             UI.PauseMenu.EnsureExists();
             SFX.EnsureExists();
             GameClient.onLevelStartRequested += OnLevelRequested;
@@ -34,6 +41,10 @@ namespace CoreSystems {
             GameClient.onPlayerJoined += OnPlayerJoined;
             GameClient.onPauseRequested += OnPauseRequested;
             GameClient.onUnpauseRequested += OnUnPauseRequested;
+            UI.Ingame.GameUI.instance.visible = isInLevel;
+            if(isInLevel){
+                SpawnCarAndResume();
+            }
 
             void OnLevelRequested (int requestedLevel) {
                 if(m_loading || isInLevel){
@@ -59,6 +70,7 @@ namespace CoreSystems {
                     return;
                 }
                 m_currentLevelPlayers.Remove(leftPlayer);
+                m_currentLevelSpectators.Remove(leftPlayer);
                 if(m_currentLevelPlayers.Count < 1){
                     m_nextScene = MAIN_MENU_SCENE_INDEX;
                 }else{
@@ -73,6 +85,7 @@ namespace CoreSystems {
                 if(m_loading || !isInLevel){
                     return;
                 }
+                m_currentLevelSpectators.Add(newPlayer);
                 GameClient.SendLevelStarted(newPlayer.id, currentLayout);
                 GameClient.SendButtonsEnabled(newPlayer.id, Button.all, false);
             }
@@ -116,39 +129,53 @@ namespace CoreSystems {
                 GameClient.ResetButtonsPressed();
                 GameClient.SendLevelStarted(currentLayout);
                 m_currentLevelPlayers.Clear();
-                var otherPlayers = new List<PlayerData>();
+                m_currentLevelSpectators.Clear();
                 foreach(var player in GameClient.connectedPlayers){
                     if(m_currentLevelPlayers.Count < 4){
                         m_currentLevelPlayers.Add(player);
                     }else{
-                        otherPlayers.Add(player);
+                        m_currentLevelSpectators.Add(player);
                     }
                 }
                 if(m_currentLevelPlayers.Count > 0){
                     IngameButtonLayout.ApplyForPlayers(m_currentLevelPlayers);
-                    foreach(var player in otherPlayers){
+                    foreach(var player in m_currentLevelSpectators){
                         GameClient.SendButtonsEnabled(player.id, Button.all, false);
                     }
                 }else{
                     m_nextScene = MAIN_MENU_SCENE_INDEX;
                 }
-                var spawn = CarSpawn.instance;
-                if(spawn == null){
-                    Debug.LogWarning("Car spawn instance not set, looking via GameObject.FindObjectOfType.");
-                    spawn = GameObject.FindObjectOfType<CarSpawn>();
-                    if(spawn == null){
-                        Debug.LogError("No spawn point found, doing default spawn!");
-                        spawn = new GameObject("Emergency Spawn").AddComponent<CarSpawn>();
-                        spawn.transform.position = Vector3.up;
-                        spawn.transform.rotation = Quaternion.identity;
-                    }
-                }
-                spawn.SpawnCar();
-                Unpause();
+                SpawnCarAndResume();
             }else{
                 GameClient.SendMainMenuOpened();
             }
             m_loading = false;
+        }
+
+        void SpawnCarAndResume () {
+            var spawn = CarSpawn.current;
+            if(spawn == null){
+                Debug.LogWarning("Car spawn instance not set, looking via GameObject.FindObjectOfType.");
+                spawn = GameObject.FindObjectOfType<CarSpawn>();
+                if(spawn == null){
+                    Debug.LogError("No spawn point found, doing default spawn!");
+                    spawn = new GameObject("Emergency Spawn").AddComponent<CarSpawn>();
+                    spawn.transform.position = Vector3.up;
+                    spawn.transform.rotation = Quaternion.identity;
+                }
+            }
+            var car = spawn.SpawnCar();
+            car.onDied += OnPlayerDeath;
+            if(GameClient.connected){
+                Unpause();
+            }
+            car.inputBlocked = true;
+            UI.Ingame.GameUI.instance.countdown.DoCountdown(() => {
+                car.inputBlocked = false;
+                if(Level.current != null){
+                    Level.current.StartTimer();
+                }
+            });
         }
 
         bool IsAnActivePlayer (PlayerData playerToCheck) {
@@ -174,6 +201,19 @@ namespace CoreSystems {
             UI.PauseMenu.instance.Hide();
             GameClient.UpdatePauseState(-1, false);
             Time.timeScale = 1f;
+        }
+
+        void OnPlayerDeath () {
+            Debug.Log("TODO game over");
+            // show the game over screen
+            // tell the clients that the game is over
+            // options (return to menu, retry)
+            if(Level.current != null){
+                var levelSaveData = Level.current.GetSaveData();
+                SaveFile.SetLevelSaveData(levelSaveData);
+                SaveFile.IncreaseCoinCounter(levelSaveData.coinsCollected);
+                SaveFile.IncreaseTotalPlayTime(levelSaveData.playDuration);
+            }
         }
 
     }

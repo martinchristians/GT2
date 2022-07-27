@@ -8,28 +8,22 @@ namespace CoreSystems {
 
     public class CarSpawn : MonoBehaviour {
 
-        public static CarSpawn instance { get; private set; }
+        public static CarSpawn current { get; private set; }
 
         bool m_carSpawned = false;
         
         void Awake () {
-            instance = this;
+            current = this;
         }
 
-        void Start () {
-            if(!m_carSpawned){
-                Debug.Log("Car spawner spawning car!");
-                SpawnCar();
-            }
-        }
-
-        public void SpawnCar () {
+        public CarController SpawnCar () {
             if(m_carSpawned){
                 Debug.LogWarning("Car already spawned, aborting call!");
-                return;
+                return null;
             }
-            Instantiate(GameConfig.instance.carPrefab, this.transform.position, this.transform.rotation);
+            var spawnedGO = Instantiate(GameConfig.instance.carPrefab, this.transform.position, this.transform.rotation);
             m_carSpawned = true;
+            return spawnedGO.GetComponentInChildren<CarController>();
         }
 
         void OnDrawGizmos () {
