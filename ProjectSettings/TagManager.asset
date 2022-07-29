@@ -9,6 +9,8 @@ TagManager:
   - Cone
   - TheEnd
   - Ground
+  - nextLevel
+  - parkingSlot
   layers:
   - Default
   - TransparentFX

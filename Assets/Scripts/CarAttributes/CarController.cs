@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using KenCars;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CarController : MonoBehaviour {
 
@@ -10,6 +11,7 @@ public class CarController : MonoBehaviour {
     private const float BOOST_SPEED = 25;
     private const float DAMAGE_COOLDOWN_LENGTH = 0.333f;
     private const float DAMAGE_DELTA_V_THRESHOLD = 2;
+    private float timerCountDown = 3f;
 
     [Header("Components")]
     [SerializeField] Rigidbody m_actualBody;
@@ -129,6 +131,29 @@ public class CarController : MonoBehaviour {
         //         }
         //     }
         // }
+    }
+
+    public bool triggerStay;
+    void OnTriggerStay(Collider other)
+    {
+        timerCountDown -= Time.deltaTime;
+        if (other.gameObject.tag == "parkingSlot" &&
+            other.bounds.Contains(gameObject.GetComponent<SphereCollider>().bounds.min) &&
+            other.bounds.Contains(gameObject.GetComponent<SphereCollider>().bounds.max))
+        {
+            if (timerCountDown < 0)
+            {
+                triggerStay = true;
+                Destroy(other.gameObject);
+            }
+        } else if (other.gameObject.tag == "nextLevel")
+        {
+            if (timerCountDown < 0)
+            {
+                SceneManager.LoadScene(0);
+            }
+        }
+
     }
 
     public void Boost (Vector3 boostVector) {
