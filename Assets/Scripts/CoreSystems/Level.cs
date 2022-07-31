@@ -85,8 +85,10 @@ public class Level : MonoBehaviour {
     }
 
     public void CheckpointPassed () {
-        var timeGain = Mathf.Lerp(m_maxTimeGain, m_minTimeGain, Mathf.Clamp01((float)m_checkpointsPassed / m_stepsFromMaxToMinTimeGain));
-        remainingTime += timeGain;
+        if(remainingTime > 0){
+            var timeGain = Mathf.Lerp(m_maxTimeGain, m_minTimeGain, Mathf.Clamp01((float)m_checkpointsPassed / m_stepsFromMaxToMinTimeGain));
+            remainingTime += timeGain;
+        }
         m_checkpointsPassed++;
         onCheckpointPassed();
     }

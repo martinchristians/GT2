@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using Communication;
 using KenCars;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class CarController : MonoBehaviour {
 
@@ -12,7 +10,6 @@ public class CarController : MonoBehaviour {
     private const float BOOST_SPEED = 25;
     private const float DAMAGE_COOLDOWN_LENGTH = 0.333f;
     private const float DAMAGE_DELTA_V_THRESHOLD = 2;
-    private float timerCountDown = 3f;
 
     [Header("Components")]
     [SerializeField] Rigidbody m_actualBody;
@@ -108,54 +105,6 @@ public class CarController : MonoBehaviour {
         }else{
             m_collidedWithSomethingDamaging = true;
         }
-        // if(collision.gameObject.tag != "Ground"){
-        //     Debug.Log("Collided with: " + collision.gameObject.name);
-        //     if (collision.gameObject.tag == "TheEnd"){
-        //         TakeDamage(MAX_HEALTH);
-        //     }else if(hasShields){
-        //         CallMedal();
-        //         currentArmor--;
-        //         onShieldsLost();
-        //     }else{
-        //         TakeDamage(1);
-        //         if(!isDead){
-        //             CallMedal();
-        //             if (collision.gameObject.tag == "Damage"){
-        //                 Debug.Log("Collide normally");
-        //             }else if (collision.gameObject.tag == "BigSmall"){
-        //                 Debug.LogWarning("Big Small effect has been disabled!");
-        //             }else if (collision.gameObject.tag == "Cone"){
-        //                 Debug.Log("Collide with Road Cone");
-        //                 m_vehicle.sphere.velocity = Vector3.Lerp(m_vehicle.sphere.velocity, Vector3.zero, Time.deltaTime * 1000f);
-        //                 collision.gameObject.GetComponent<Rigidbody>().AddForce(Vector3.back * 5000.0f);
-        //             }
-        //         }
-        //     }
-        // }
-    }
-
-    public bool triggerStay;
-    void OnTriggerStay(Collider other)
-    {
-        timerCountDown -= Time.deltaTime;
-        if (other.gameObject.tag == "parkingSlot" &&
-            other.bounds.Contains(gameObject.GetComponent<SphereCollider>().bounds.min) &&
-            other.bounds.Contains(gameObject.GetComponent<SphereCollider>().bounds.max))
-        {
-            if (timerCountDown < 0)
-            {
-                triggerStay = true;
-                Destroy(other.gameObject);
-            }
-        } else if (other.gameObject.tag == "nextLevel")
-        {
-            if (timerCountDown < 0)
-            {
-                SceneManager.LoadScene(0); //loads menu
-                GameClient.SendMainMenuOpened();
-            }
-        }
-
     }
 
     public void Boost (Vector3 boostVector) {
@@ -194,28 +143,6 @@ public class CarController : MonoBehaviour {
             m_vehicle.controllable = false;
             m_camController.followPosition = false;
         }
-    }
-
-    void CallMedal() {
-        // try{
-        //     showMedal.CallMedal();
-        //     showMedal.medalObj.GetComponent<Image>().sprite = showMedal.spriteMedal;
-        //     showMedal.medalObj.GetComponent<Image>().enabled = true;
-
-        //     showMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = showMedal.quote;
-        //     showMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
-
-        //     StartCoroutine(SetInactive());
-        // }catch{
-        //     Debug.LogWarning("naughty");
-        // }
-
-        // IEnumerator SetInactive()
-        // {
-        //     yield return new WaitForSeconds(4f);
-        //     showMedal.medalObj.GetComponent<Image>().enabled = false;
-        //     showMedal.medalObj.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().enabled = false;
-        // }
     }
 
 }

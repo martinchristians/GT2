@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,7 +27,9 @@ namespace CoreSystems {
 
 #endif
 
-        const int MAIN_MENU_SCENE_INDEX = 0;
+        public const int MAIN_MENU_SCENE_INDEX = 0;
+        public const int TUTORIAL_SCENE_INDEX = 1;
+        public const int ENDLESS_RUNNER_SCENE_INDEX = 2;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void CreateInstance () {
@@ -34,18 +37,32 @@ namespace CoreSystems {
         }
 
         bool m_loading = false;
-        int m_nextScene = -1;
         bool m_currentlyGameOver = false;
         Coroutine m_gameOverSequence = null;
+
+        int _nextScene = -1;
+        int nextScene {
+            get => _nextScene;
+            set {
+                _nextScene = value;
+                // Debug.Log("next scene queued: " + value);
+            }
+        }
 
         static List<PlayerData> m_currentLevelPlayers = new List<PlayerData>();
         static List<PlayerData> m_currentLevelSpectators = new List<PlayerData>();
 
-        static bool isInLevel => SceneManager.GetActiveScene().buildIndex != 0;
-        static GamepadLayout currentLayout => (SceneManager.GetActiveScene().buildIndex == 3) ? GamepadLayout.jump : GamepadLayout.standard;
+        static bool IsInScene (int sceneIndex) => SceneManager.GetActiveScene().buildIndex == sceneIndex;
+        static bool isInMainMenu => IsInScene(MAIN_MENU_SCENE_INDEX);
+        static bool isInTutorial => IsInScene(TUTORIAL_SCENE_INDEX);
+        static bool isInLevel => IsInScene(ENDLESS_RUNNER_SCENE_INDEX);
+        // static GamepadLayout currentLayout => (SceneManager.GetActiveScene().buildIndex == 3) ? GamepadLayout.jump : GamepadLayout.standard;
+        static GamepadLayout currentLayout => GamepadLayout.standard;
 
         public static bool isPaused { get; private set; }
         public static PlayerData pausedByPlayerData { get; private set; }
+
+        public static PlayerData tutorialRequesterPlayerData { get; private set; }
 
         public static IReadOnlyList<PlayerData> players => m_currentLevelPlayers;
         public static IReadOnlyList<PlayerData> spectators => m_currentLevelSpectators;
@@ -56,6 +73,7 @@ namespace CoreSystems {
             UI.PauseMenu.EnsureExists();
             UI.GameOver.GameOverUI.EnsureExists();
             SFX.EnsureExists();
+            GameClient.onTutorialRequested += OnTutorialRequested;
             GameClient.onLevelStartRequested += OnLevelRequested;
             GameClient.onMainMenuRequested += OnMainMenuRequested;
             GameClient.onPlayerLeft += OnPlayerLeft;
@@ -69,34 +87,48 @@ namespace CoreSystems {
                 SpawnCarAndResume();
             }
 
+            void OnTutorialRequested (PlayerData tutorialRequester) {
+                if(m_loading || isInTutorial){
+                    return;
+                }
+                tutorialRequesterPlayerData = tutorialRequester;
+                nextScene = TUTORIAL_SCENE_INDEX;
+            }
+
             void OnLevelRequested (int requestedLevel) {
                 if(m_loading || isInLevel){
                     return;
                 }
-                m_nextScene = requestedLevel;
+                nextScene = requestedLevel;
             }
 
             void OnMainMenuRequested (PlayerData mainMenuPlayer) {
-                if(m_loading || !isInLevel){
+                if(m_loading || isInMainMenu){
                     return;
                 }
-                if(isPaused){
+                if(isInLevel && isPaused){
                     if(!mainMenuPlayer.Equals(pausedByPlayerData)){
                         return;
                     }
                 }
-                m_nextScene = MAIN_MENU_SCENE_INDEX;
+                nextScene = MAIN_MENU_SCENE_INDEX;
             }
 
             void OnPlayerLeft (PlayerData leftPlayer) {
-                if(m_loading || !isInLevel){
+                if(m_loading || isInMainMenu){
                     return;
                 }
-                m_currentLevelPlayers.Remove(leftPlayer);
-                m_currentLevelSpectators.Remove(leftPlayer);
-                if(m_currentLevelPlayers.Count < 1){
-                    m_nextScene = MAIN_MENU_SCENE_INDEX;
-                }else{
+                if(isInTutorial){
+                    if(leftPlayer.id == tutorialRequesterPlayerData.id){
+                        nextScene = MAIN_MENU_SCENE_INDEX;
+                    }
+                }
+                if(isInLevel){
+                    m_currentLevelPlayers.Remove(leftPlayer);
+                    m_currentLevelSpectators.Remove(leftPlayer);
+                    if(m_currentLevelPlayers.Count < 1){
+                        nextScene = MAIN_MENU_SCENE_INDEX;
+                    }
                     IngameButtonLayout.ApplyForPlayers(m_currentLevelPlayers);
                     if(isPaused && leftPlayer.Equals(pausedByPlayerData)){
                         Unpause();
@@ -105,12 +137,15 @@ namespace CoreSystems {
             }
 
             void OnPlayerJoined (PlayerData newPlayer) {
-                if(m_loading || !isInLevel){
+                if(m_loading || isInMainMenu){
                     return;
                 }
                 m_currentLevelSpectators.Add(newPlayer);
                 GameClient.SendLevelStarted(newPlayer.id, currentLayout);
                 GameClient.SendButtonsEnabled(newPlayer.id, Button.all, false);
+                if(isInTutorial || isPaused){
+                    GameClient.UpdatePauseState(pausedByPlayerData.id, true);
+                }
             }
 
             void OnPauseRequested (PlayerData pausePlayer) {
@@ -120,13 +155,18 @@ namespace CoreSystems {
             }
 
             void OnUnPauseRequested (PlayerData unpausePlayer) {
-                if(m_loading || !isInLevel){
+                if(m_loading){
                     return;
                 }
-                if(m_currentlyGameOver){
-                    m_nextScene = SceneManager.GetActiveScene().buildIndex;
-                }else if(isPaused && pausedByPlayerData.Equals(unpausePlayer)){
-                    Unpause();
+                if(isInTutorial && pausedByPlayerData.Equals(unpausePlayer)){
+                    nextScene = ENDLESS_RUNNER_SCENE_INDEX;
+                }
+                if(isInLevel){
+                    if(m_currentlyGameOver){
+                        nextScene = SceneManager.GetActiveScene().buildIndex;
+                    }else if(isPaused && pausedByPlayerData.Equals(unpausePlayer)){
+                        Unpause();
+                    }
                 }
             }
         }
@@ -135,9 +175,9 @@ namespace CoreSystems {
             if(m_loading){
                 return;
             }
-            if(m_nextScene >= 0){
-                StartCoroutine(LoadScene(m_nextScene));
-                m_nextScene = -1;
+            if(nextScene >= 0){
+                StartCoroutine(LoadScene(nextScene));
+                nextScene = -1;
             }
         }
 
@@ -158,7 +198,9 @@ namespace CoreSystems {
             m_loading = true;
             yield return SceneManager.LoadSceneAsync(sceneIndex);
             UI.GameOver.GameOverUI.Hide();
-            if(sceneIndex > MAIN_MENU_SCENE_INDEX){
+            UI.Ingame.GameUI.instance.visible = isInLevel;
+            if(isInLevel){
+                UI.Ingame.GameUI.instance.OnNewLevel();
                 GameClient.ResetButtonsPressed();
                 GameClient.SendLevelStarted(currentLayout);
                 m_currentLevelPlayers.Clear();
@@ -176,16 +218,26 @@ namespace CoreSystems {
                         GameClient.SendButtonsEnabled(player.id, Button.all, false);
                     }
                 }else{
-                    m_nextScene = MAIN_MENU_SCENE_INDEX;
+                    nextScene = MAIN_MENU_SCENE_INDEX;
                 }
-                UI.Ingame.GameUI.instance.visible = true;
-                UI.Ingame.GameUI.instance.OnNewLevel();
                 SpawnCarAndResume();
-            }else{
-                UI.Ingame.GameUI.instance.visible = false;
+            }
+            if(isInMainMenu){
                 GameClient.SendMainMenuOpened();
             }
-            if(GameClient.connected){
+            if(isInTutorial){
+                var tutorialRequesterStillInLobby = GameClient.connectedPlayers.Any((pd) => pd.id == tutorialRequesterPlayerData.id);
+                if(!tutorialRequesterStillInLobby && GameClient.connectedPlayers.Count > 0){
+                    tutorialRequesterPlayerData = GameClient.connectedPlayers[0];
+                    tutorialRequesterStillInLobby = true;
+                }
+                if(tutorialRequesterStillInLobby){
+                    GameClient.SendLevelStarted(GamepadLayout.standard);    // HACK because i need the players to have the game layout
+                    Pause(tutorialRequesterPlayerData);
+                }else{
+                    nextScene = MAIN_MENU_SCENE_INDEX;
+                }
+            }else{
                 Unpause();
             }
             m_loading = false;
@@ -235,27 +287,20 @@ namespace CoreSystems {
         void Pause (PlayerData pausePlayer) {
             isPaused = true;
             pausedByPlayerData = pausePlayer;
-            UI.PauseMenu.instance.Show(pausePlayer.name);
+            if(isInLevel){
+                UI.PauseMenu.instance.Show(pausePlayer.name);
+                Time.timeScale = 0f;
+            }
             GameClient.UpdatePauseState(pausePlayer.id, true);
-            Time.timeScale = 0f;
         }
 
         void Unpause () {
             isPaused = false;
             pausedByPlayerData = default;
             UI.PauseMenu.instance.Hide();
-            GameClient.UpdatePauseState(-1, false);
             Time.timeScale = 1f;
+            GameClient.UpdatePauseState(-1, false);
         }
-
-        // TODO also have a successful end
-        // player death should be ignored after that
-        // input should still be off and the handing the same
-        // the whole game over sequence should be the same tbh
-        // with the camera stuck and all that
-        // just with more health
-        // save data probably needs a "success" field
-        // so that you can't fail the timed challenge but have a better score because you failed faster
 
         void OnPlayerDeath () {
             m_currentlyGameOver = true;

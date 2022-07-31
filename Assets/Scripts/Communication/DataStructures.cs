@@ -4,6 +4,8 @@ using System.Linq;
 
 namespace Communication {
 
+    // i'd just like to say that this is a pain in the ass. the web-app can just have any field null, but of course this isn't possible with c#, so i have to create distinct data structures
+
     [System.Serializable]
     struct BroadcastGameMessage {
 

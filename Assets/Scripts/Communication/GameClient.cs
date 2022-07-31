@@ -9,6 +9,7 @@ namespace Communication {
     public static class GameClient {
 
         public static event System.Action<string> onRoomCodeGenerated = delegate {};
+        public static event System.Action<PlayerData> onTutorialRequested = delegate {};
         public static event System.Action<int> onLevelStartRequested = delegate {};
         public static event System.Action<PlayerData> onMainMenuRequested = delegate {};
         public static event System.Action<PlayerData> onPlayerJoined = delegate {};
@@ -84,13 +85,21 @@ namespace Communication {
                 var result = await socket.ReceiveAsync(bytes, CancellationToken.None);
                 var receivedText = System.Text.Encoding.UTF8.GetString(bytes.Array, 0, result.Count);
                 var data = JsonUtility.FromJson<ServerOrClientMessage>(receivedText);
+                Debug.Log($"received message \"{data.type}\"\n{receivedText}");
                 switch(data.type){
                     case "room_created":
                         roomCode = data.room_code;
                         onRoomCodeGenerated(roomCode);
                         break;
                     case "start_level":
-                        onLevelStartRequested(data.level);
+                        switch(data.level){
+                            case CoreSystems.GameManager.TUTORIAL_SCENE_INDEX:
+                                onTutorialRequested(_connectedPlayers.Single((pd) => pd.id == data.from));
+                                break;
+                            default:
+                                onLevelStartRequested(data.level);
+                                break;
+                        }
                         break;
                     case "return_to_menu":
                         onMainMenuRequested(connectedPlayers.Single((pd) => pd.id == data.from));
@@ -156,7 +165,7 @@ namespace Communication {
             }));
         }
 
-        public static async void SendMainMenuOpened () { //tells client to close controls and reopen menu
+        public static async void SendMainMenuOpened () {
             await SendMessage(JsonUtility.ToJson(new BroadcastGameMessage(){
                 type = "main_menu_opened"
             }));
