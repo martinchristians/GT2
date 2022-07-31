@@ -75,20 +75,20 @@
     } else if (msg.type === 'player_left') {
       players[msg.id] = undefined
     } else if (msg.type === 'game_disconnected') {
-      window.navigator.vibrate(200)
+      window.navigator.vibrate &&  window.navigator.vibrate(200)
       socket = null
       leave()
     } else if (msg.type === 'invalid_message') {
       console.error('Invalid message:', msg)
     } else if (msg.type === 'set_paused') {
-      window.navigator.vibrate(200)
+      window.navigator.vibrate &&  window.navigator.vibrate(200)
       if (msg.paused === false) {
         paused = 0
       } else {
         paused = msg.player == me.id ? 1 : 2
       }
     } else if (msg.type === 'level_started') {
-      window.navigator.vibrate(200)
+      window.navigator.vibrate &&  window.navigator.vibrate(200)
       view = 'game'
       paused = 0
       disabledButtons.clear()
@@ -111,7 +111,7 @@
         disabledButtons = disabledButtons
         console.log('disabled buttons', msg.buttons)
       }
-      window.navigator.vibrate([150, 50, 150])
+      window.navigator.vibrate &&  window.navigator.vibrate([150, 50, 150])
     }
   }
 
