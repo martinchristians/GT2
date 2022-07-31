@@ -42,6 +42,7 @@
   form
     :global(> svg)
       width: 100%
+      min-height: 100px
     flex-direction: column
     padding: 32px
     display: flex

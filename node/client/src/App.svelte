@@ -6,12 +6,14 @@
     Player,
     ServerMessage,
   } from '@server/messages'
+  import {ButtonColor} from '@server/messages'
   import ArcadeButton from './components/arcade-button.svelte'
   import GameHeader from './components/game-header.svelte'
   import Gamepad from './components/gamepad.svelte'
   import defaultLayout from './default-layout'
   import jumpLayout from './jump-layout'
   import Join, { JoinEvent } from './views/join.svelte'
+  import IconCar from './assets/btn/btn-car.svg'
 
   let view = 'join'
   let paused = 0
@@ -37,10 +39,17 @@
     const url = new URL(`ws://${locationUrl.hostname}:3000/joinGame`)
     url.searchParams.set('room', roomCode)
     url.searchParams.set('name', playerName)
-    socket = new WebSocket(url)
+
+    try {
+      socket = new WebSocket(url)
+    } catch (e) {
+      console.log('sss')
+      error = 'Failed to connect with server.'
+      return
+    }
 
     socket.addEventListener('error', () => {
-      error = 'Failed to connect with server.'
+      error = 'Could not connect to game. Did you enter a valid room code?'
     })
     socket.addEventListener('open', () => {
       view = 'lobby'
@@ -66,17 +75,20 @@
     } else if (msg.type === 'player_left') {
       players[msg.id] = undefined
     } else if (msg.type === 'game_disconnected') {
+      window.navigator.vibrate(200)
       socket = null
       leave()
     } else if (msg.type === 'invalid_message') {
       console.error('Invalid message:', msg)
     } else if (msg.type === 'set_paused') {
+      window.navigator.vibrate(200)
       if (msg.paused === false) {
         paused = 0
       } else {
         paused = msg.player == me.id ? 1 : 2
       }
     } else if (msg.type === 'level_started') {
+      window.navigator.vibrate(200)
       view = 'game'
       paused = 0
       disabledButtons.clear()
@@ -99,6 +111,7 @@
         disabledButtons = disabledButtons
         console.log('disabled buttons', msg.buttons)
       }
+      window.navigator.vibrate([150, 50, 150])
     }
   }
 
@@ -143,17 +156,23 @@
         </ul>
       </section>
       <section class="level-select grow scroll">
-        <h2>Level</h2>
-        {#each [1, 2, 3] as level}
-          <ArcadeButton
-            flex={true}
-            on:click={() =>
-              send({
-                type: 'start_level',
-                level,
-              })}>Level {level}</ArcadeButton
-          >
-        {/each}
+        <ArcadeButton
+          flex={true}
+          on:click={() =>
+            send({
+              type: 'start_level',
+              level: 1,
+            })}>Play Tutorial</ArcadeButton
+        >
+        <ArcadeButton
+          flex={true}
+          variant={ButtonColor.Green}
+          on:click={() =>
+            send({
+              type: 'start_level',
+              level: 2,
+            })}>{@html IconCar}<p>Play Game</p></ArcadeButton
+        >
       </section>
     </div>
   {:else if view === 'game'}
@@ -184,8 +203,10 @@
 .level-select
   display: flex
   flex-direction: column
-  padding: 16px
-  gap: 20px 16px
+  padding: 32px
+  gap: 32px
+  :global(:nth-child(2))
+    flex: 1
 
 .players
   h2
@@ -197,4 +218,16 @@
       display: block
       padding: 4px
       border-radius: 8px
+
+.error
+  position: fixed
+  left: 16px
+  right: 16px
+  top: 16px
+  background-color: var(--wds-red-10)
+  color: var(--wds-red-90)
+  border: 1px solid var(--wds-red-80)
+  border-radius: 16px
+  padding: 16px
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.75)
 </style>

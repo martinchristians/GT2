@@ -116,18 +116,18 @@ button
   &:disabled
     @each $color in $colors
       &:global(.#{$color} > div)
-        background: var(--wds-#{$color}-70)
+        background: var(--wds-#{$color}-80)
         transition: background-color 250ms cubic-bezier(0.22, 0.61, 0.36, 1)
       &:global(.#{$color}::before)
         background: var(--wds-#{$color}-90)
         transition: background-color 250ms cubic-bezier(0.22, 0.61, 0.36, 1)
     > div
       > span
-          opacity: 0.6
+          opacity: 0.2
       &::after
-        background: radial-gradient(50% 50% at 50% 50%, rgba(0, 0, 0, 0.5) 31.77%, rgba(0, 0, 0, 0.2) 100%)
+        background: radial-gradient(50% 50% at 50% 50%, rgba(0, 0, 0, 0.8) 31.77%, rgba(0, 0, 0, 0.4) 100%)
     &::after
-      background: linear-gradient(90deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 10%, rgba(0, 0, 0, 0.2) 90%, rgba(0, 0, 0, 0.5) 100%)
+      background: linear-gradient(90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.3) 10%, rgba(0, 0, 0, 0.2) 90%, rgba(0, 0, 0, 0.9) 100%)
 
   &.flex
     width: 100%
