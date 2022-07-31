@@ -185,6 +185,9 @@ namespace CoreSystems {
                 UI.Ingame.GameUI.instance.visible = false;
                 GameClient.SendMainMenuOpened();
             }
+            if(GameClient.connected){
+                Unpause();
+            }
             m_loading = false;
         }
 
@@ -203,9 +206,6 @@ namespace CoreSystems {
             }
             var car = spawn.SpawnCar();
             car.onDied += OnPlayerDeath;
-            if(GameClient.connected){
-                Unpause();
-            }
 #if UNITY_EDITOR
             if(!UnityEditor.EditorPrefs.GetBool(START_WITH_COUNTDOWN_KEY, true)){
                 if(Level.current != null){
