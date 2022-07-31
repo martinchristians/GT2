@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Communication;
 using KenCars;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -150,7 +151,8 @@ public class CarController : MonoBehaviour {
         {
             if (timerCountDown < 0)
             {
-                SceneManager.LoadScene(0);
+                SceneManager.LoadScene(0); //loads menu
+                GameClient.SendMainMenuOpened();
             }
         }
 

@@ -156,7 +156,7 @@ namespace Communication {
             }));
         }
 
-        public static async void SendMainMenuOpened () {
+        public static async void SendMainMenuOpened () { //tells client to close controls and reopen menu
             await SendMessage(JsonUtility.ToJson(new BroadcastGameMessage(){
                 type = "main_menu_opened"
             }));

@@ -30,7 +30,7 @@ public class TutorialArena : MonoBehaviour
                 anim.Play("panel");
             } else if (countParkingSlot == 0)
             {
-                panel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Well done! Now lets go to the real challenge";
+                panel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Well done! Now lets go to the real challenge. Drive through the door to explore more!";
                 anim.Play("panel");
                 gameObject.GetComponent<Animator>().Play("openDoor");
             }
