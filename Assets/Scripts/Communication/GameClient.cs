@@ -8,6 +8,32 @@ namespace Communication {
 
     public static class GameClient {
 
+#if UNITY_EDITOR
+
+        const string USE_SERVER_KEY = "useRemoteServer";
+        const bool USE_SERVER_BY_DEFAULT = false;
+
+        [UnityEditor.MenuItem("Custom/Server/Remote")]
+        static void EnableRemoteServer () => UnityEditor.EditorPrefs.SetBool(USE_SERVER_KEY, true);
+
+        [UnityEditor.MenuItem("Custom/Server/Remote", true)]
+        static bool EnableRemoteServerEnabled () => !UnityEditor.EditorPrefs.GetBool(USE_SERVER_KEY, USE_SERVER_BY_DEFAULT);
+
+        [UnityEditor.MenuItem("Custom/Server/Localhost")]
+        static void DisableRemoteServer () => UnityEditor.EditorPrefs.SetBool(USE_SERVER_KEY, false);
+
+        [UnityEditor.MenuItem("Custom/Server/Localhost", true)]
+        static bool DisableRemoteServerEnabled () => UnityEditor.EditorPrefs.GetBool(USE_SERVER_KEY, USE_SERVER_BY_DEFAULT);
+
+#else
+
+        const string USE_LOCAL_SERVER_PARAM = "useLocalServer";
+
+#endif
+
+        const string LOCAL_SERVER_ADDRESS = "ws://127.0.0.1:3000/createGame";
+        const string REMOTE_SERVER_ADDRESS = "ws://jwels.berlin:3000/createGame";
+
         public static event System.Action<string> onRoomCodeGenerated = delegate {};
         public static event System.Action<PlayerData> onTutorialRequested = delegate {};
         public static event System.Action<int> onLevelStartRequested = delegate {};
@@ -62,8 +88,22 @@ namespace Communication {
 #endif
             try{
                 socket = new ClientWebSocket();
-                await socket.ConnectAsync(new System.Uri("ws://127.0.0.1:3000/createGame"), CancellationToken.None);
-                // await socket.ConnectAsync(new System.Uri("ws://jwels.berlin:3000/createGame"), CancellationToken.None);
+                string serverAddress;
+#if UNITY_EDITOR
+                if(UnityEditor.EditorPrefs.GetBool(USE_SERVER_KEY, USE_SERVER_BY_DEFAULT)){
+                    serverAddress = REMOTE_SERVER_ADDRESS;
+                }else{
+                    serverAddress = LOCAL_SERVER_ADDRESS;
+                }
+#else
+                if(System.Environment.GetCommandLineArgs().Any((arg) => arg.Trim().Equals(USE_LOCAL_SERVER_PARAM))){
+                    serverAddress = LOCAL_SERVER_ADDRESS;
+                }else{
+                    serverAddress = REMOTE_SERVER_ADDRESS;
+                }
+#endif
+                Debug.Log($"attempting to connect to \"{serverAddress}\"");
+                await socket.ConnectAsync(new System.Uri(serverAddress), CancellationToken.None);
                 switch(socket.State){
                     case WebSocketState.Open:
                         Application.quitting += socket.Abort;
@@ -85,7 +125,7 @@ namespace Communication {
                 var result = await socket.ReceiveAsync(bytes, CancellationToken.None);
                 var receivedText = System.Text.Encoding.UTF8.GetString(bytes.Array, 0, result.Count);
                 var data = JsonUtility.FromJson<ServerOrClientMessage>(receivedText);
-                Debug.Log($"received message \"{data.type}\"\n{receivedText}");
+                // Debug.Log($"received message \"{data.type}\"\n{receivedText}");
                 switch(data.type){
                     case "room_created":
                         roomCode = data.room_code;
