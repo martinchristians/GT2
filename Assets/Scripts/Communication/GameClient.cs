@@ -32,7 +32,7 @@ namespace Communication {
 #endif
 
         const string LOCAL_SERVER_ADDRESS = "ws://127.0.0.1:3000/createGame";
-        const string REMOTE_SERVER_ADDRESS = "ws://jwels.berlin:3000/createGame";
+        const string REMOTE_SERVER_ADDRESS = "wss://game.jwels.berlin/api/createGame";
 
         public static event System.Action<string> onRoomCodeGenerated = delegate {};
         public static event System.Action<PlayerData> onTutorialRequested = delegate {};
