@@ -100,7 +100,10 @@
     > span
       position: absolute
       &::after
-        inset: 0
+        top: 0
+        left: 0
+        right: 0
+        bottom: 0
         background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0) 100%)
         background-size: 16px 3px
         mix-blend-mode: overlay

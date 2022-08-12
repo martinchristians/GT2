@@ -28,6 +28,9 @@ export default [{
     svelte({
       preprocess: sveltePreprocess({
         sourceMap: !production,
+        postcss: {
+          plugins: [require('autoprefixer')(require('./package.json').browserslist)],
+        }
       }),
 
       compilerOptions: {

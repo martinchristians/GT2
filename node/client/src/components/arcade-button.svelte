@@ -75,7 +75,10 @@ button
     &::after
       content: ""
       position: absolute
-      inset: 0
+      top: 0
+      left: 0
+      right: 0
+      bottom: 0
       transition: opacity 50ms linear
       background: radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.5) 31.77%, rgba(255, 255, 255, 0) 100%)
       opacity: .5

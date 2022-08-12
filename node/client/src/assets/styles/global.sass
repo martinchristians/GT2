@@ -6,8 +6,11 @@ body, html, main
 
 html, body
   overscroll-behavior-y: contain
+  touch-action: pan-x pan-y
 
 *
+  -webkit-user-select: none
+  user-select: none
   padding: 0
   margin: 0
 
@@ -22,6 +25,10 @@ button, input, textarea
   line-height: inherit
   color: inherit
   background: transparent
+
+input, textarea
+  -webkit-user-select: auto
+  user-select: auto
 
 body
   color: var(--wds-light-grey-05)
@@ -50,6 +57,7 @@ main
 
 .scroll
   overflow-y: auto
+  touch-action: auto
   padding: 16px
   box-shadow: inset 0px 0px 128px rgba(0, 0, 0, 1.0)
 

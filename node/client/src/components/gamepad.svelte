@@ -101,7 +101,10 @@ grid-template-rows: ${buttonLayout.gridRows};
     overflow: hidden
   .pausemenu
     position: absolute
-    inset: 0
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
     z-index: 100
     background: rgba(22, 21, 27, 0.75)
     padding: 32px

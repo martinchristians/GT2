@@ -34,9 +34,7 @@
     // create new url with search params
     me.name = playerName
 
-    const locationUrl = new URL(window.location.href)
-
-    const url = new URL(`ws://${locationUrl.hostname}:3000/joinGame`)
+    const url = new URL(`wss://game.jwels.berlin/api/joinGame`)
     url.searchParams.set('room', roomCode)
     url.searchParams.set('name', playerName)
 
@@ -162,7 +160,7 @@
             send({
               type: 'start_level',
               level: 1,
-            })}>Play Tutorial</ArcadeButton
+            })}>Show Tutorial</ArcadeButton
         >
         <ArcadeButton
           flex={true}
