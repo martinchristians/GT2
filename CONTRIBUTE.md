@@ -16,7 +16,7 @@ Admin: @Martin Christian Solihin
 6. Client terminal zeigt Port an auf dem man sich verbinden kann
 7. Unity Anwendung oder Build mit Konsolenparameter starten (useLocalServer) --> alle player müssen Bildschirm sehen können
 
-### Mit Unity Build
+### Server - online
 
 1. Unity Build starten: https://github.com/martinchristians/PartiallyKart/blob/main/PartiallyKart.exe --> alle player müssen Bildschirm sehen können
 2. Player loggen sich über die Webseite ein: [https://game.jwels.berlin](https://game.jwels.berlin/)
