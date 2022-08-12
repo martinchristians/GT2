@@ -14,7 +14,7 @@ Admin: @Martin Christian Solihin
 4. In beiden 'npm i' ausführen, um dependencies zu installieren
 5. Wenn fertig: bei beiden 'npm run dev' aufrufen um zu **starten**
 6. Client terminal zeigt Port an auf dem man sich verbinden kann
-7. Unity Build mit Konsolenparameter starten (useLocalServer) --> alle player müssen Bildschirm sehen können
+7. Unity Anwendung oder Build mit Konsolenparameter starten (useLocalServer) --> alle player müssen Bildschirm sehen können
 
 ### Mit Unity Build
 
